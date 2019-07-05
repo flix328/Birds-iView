@@ -42,6 +42,9 @@ class HashCircularDoublyLinkedList {
 		this.node_dict[value] = new_node;
 	}
 	delete_value(value){
+		if(!this.node_dict[value]){
+			throw "Cannot delete something from a HashCircularDoublyLinkedList that doesn't exist";
+		}
 		var node = this.node_dict[value];
 		this.delete_node(node);
 	}
@@ -53,5 +56,21 @@ class HashCircularDoublyLinkedList {
 		if(node == this.head){
 			this.head = next_node;
 		}
+	}
+	update_value(old_val, new_val){
+		var node = this.node_dict[old_val];
+		if(!node){
+			alert(old_val, new_val, node);
+		}
+		node.value = new_val;
+	}
+	listify(){
+		var output = [this.head.value];
+		var node = this.head.next;
+		while(node != this.head){
+			output.push(node.value);
+			node = node.next;
+		}
+		return output;
 	}
 }
