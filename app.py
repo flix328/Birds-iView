@@ -16,8 +16,19 @@ def index():
 # This is the function shows the Athletes page
 @app.route('/plan', methods=["GET","POST"])
 def plan():
-	
+	#print("jsiofjasio")
 	return render_template('plan.html', title="Planning")
+
+
+
+
+
+# background process happening without any refreshing
+@app.route('/background_process_test')
+def background_process_test():
+	print("Hello")
+	return "nothing"
+	
 
 
 
@@ -25,38 +36,6 @@ def plan():
 #@app.errorhandler(404)
 #def page_not_found(e):
 #  return render_template('404.html', title="404"), 404
-#
+
 if __name__ == "__main__":
-    app.run(debug=True)
-
-
-
-
-
-
-@app.route('/plan', methods=["GET","POST"])
-def login_page():
-
-    error = ''
-    try:
-	
-        if request.method == "POST":
-		
-            attempted_username = request.form['username']
-            attempted_password = request.form['password']
-
-            #flash(attempted_username)
-            #flash(attempted_password)
-
-            if attempted_username == "admin" and attempted_password == "password":
-                return redirect(url_for('dashboard'))
-				
-            else:
-                error = "Invalid credentials. Try Again."
-
-        return render_template("login.html", error = error)
-
-    except Exception as e:
-        #flash(e)
-        return render_template("login.html", error = error)  
-		
+	app.run(debug=True)

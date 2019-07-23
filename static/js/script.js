@@ -1,3 +1,4 @@
+
 var map = L.map('mapid').setView([0, 0], 2);
 
 
@@ -32,9 +33,24 @@ function onMarkerDrag(e){
 	
 }
 
+
+
 function onMapClick(e) {
 	var marker = L.marker(e.latlng, {draggable: 'true', title: e.latlng, autoPan: 'true', autoPanPadding: [60, 50]}).addTo(map).on('click', onMarkerClick);
 	// add to existing polygon
+	
+	// prompt python with the latlng value
+	// find closest edge in polygon
+	// add point in this edge
+	// pass back up to js
+	// get rid of js classes, they would be better suited in python
+	
+	
+	
+	
+	
+	
+	
 	
 	polycoords.insert_end(e.latlng);
 	latlngs[marker._leaflet_id] = marker._latlng;
