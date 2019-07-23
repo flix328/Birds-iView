@@ -1,23 +1,9 @@
-/*
-
-var testDLL = new HashCircularDoublyLinkedList(["asd"]);
-testDLL.insert_end(1);
-testDLL.insert_end(2);
-testDLL.insert_end(3);
-
-test_list = testDLL.listify();
-
-alert(test_list);
-
-testDLL.delete_value(2);
-test_list = testDLL.listify();
-alert(test_list);
-
-*/
-
 var map = L.map('mapid').setView([0, 0], 2);
 
-var polycoords = new HashCircularDoublyLinkedList([]);
+
+// store _leaflet_id values in polygon_ids, map ids to latlng values in latlngs
+var latlngs = {};
+var polygon_ids = new HashCircularDoublyLinkedList([]);
 var polygon = L.polygon([]).addTo(map);
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -29,6 +15,11 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 }).addTo(map);
 
 function onMarkerClick(e) {
+	var id = e.target._leaflet_id;
+	var latlng = id_to_latlng[id];
+	polycoords.delete_value(e.latlng);
+	map.removeLayer(polygon);
+	polygon = L.polygon(polycoords.listify()).addTo(map);
     map.removeLayer(this);
 }
 
@@ -38,24 +29,33 @@ function onMarkerDrag(e){
 	polycoords.update_value(e.oldLatLng, e.latlng);
 	map.removeLayer(polygon);
 	polygon = L.polygon(polycoords.listify()).addTo(map);
+	
 }
 
 function onMapClick(e) {
 	var marker = L.marker(e.latlng, {draggable: 'true', title: e.latlng, autoPan: 'true', autoPanPadding: [60, 50]}).addTo(map).on('click', onMarkerClick);
 	// add to existing polygon
+	
 	polycoords.insert_end(e.latlng);
+	latlngs[marker._leaflet_id] = marker._latlng;
 	//alert(e.latlng);
 	//polycoords.push(e.latlng);
+	
+	//  _leaflet_id
+	
 	map.removeLayer(polygon);
 	marker.on('drag', onMarkerDrag);
+	marker.on('dragend', onMarkerDrag);
 	polygon = L.polygon(polycoords.listify()).addTo(map);
+	
 }
 
+// originalEvent,containerPoint,layerPoint,latlng,type,target,sourceTarget
 
 
 //map.on('click', onMapClick);
 
-var dbl_click_timeout = 200; // in milliseconds
+var dbl_click_timeout = 170; // in milliseconds
 var click_start = 0;
 var num_clicks = 0;
 map.on('click', function(event){

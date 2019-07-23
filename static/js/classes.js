@@ -59,9 +59,6 @@ class HashCircularDoublyLinkedList {
 	}
 	update_value(old_val, new_val){
 		var node = this.node_dict[old_val];
-		if(!node){
-			alert(old_val, new_val, node);
-		}
 		node.value = new_val;
 	}
 	listify(){
