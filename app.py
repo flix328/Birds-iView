@@ -3,7 +3,7 @@
 # https://github.com/stevedunford/NZVintageRadios
 
 import sqlite3
-from flask import Flask, Response, render_template, abort
+from flask import Flask, render_template, jsonify, request
 
 # Creates a Flask object called 'app' that we can use throughout the programme
 app = Flask(__name__)
@@ -16,19 +16,41 @@ def index():
 # This is the function shows the Athletes page
 @app.route('/plan', methods=["GET","POST"])
 def plan():
-	#print("jsiofjasio")
 	return render_template('plan.html', title="Planning")
 
 
 
+# Add the "python_files" directory to sys.path to import other modules
+import sys, os
+CURRENT_DIRECTORY = sys.path[0]
+sys.path.append(os.path.join(CURRENT_DIRECTORY, 'python_files'))
 
+import Objects_GPS
+import Objects_2D
+from interface import *
 
-# background process happening without any refreshing
-@app.route('/background_process_test')
-def background_process_test():
-	print("Hello")
-	return "nothing"
+# map click function happening without any refreshing
+@app.route('/onMapClick')
+def polygon_add():
+	print("A")
+	poly = request.args['poly']
 	
+	print("start", repr(poly))
+	poly = format_input_poly(poly)
+	print("end", repr(poly))	
+	
+	print("B")
+	
+	lat = float(request.args['lat'])
+	lon = float(request.args['lng'])
+	p = Objects_2D.Point(lat, lon)
+
+	print("C")	
+	poly = add_point(poly, p)
+	print([(p.x,p.y) for p in poly])
+	print("D")
+	return jsonify([(p.x,p.y) for p in poly])
+
 
 
 

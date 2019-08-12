@@ -1,11 +1,7 @@
-
 var map = L.map('mapid').setView([0, 0], 2);
 
-
-// store _leaflet_id values in polygon_ids, map ids to latlng values in latlngs
-var latlngs = {};
-var polygon_ids = new HashCircularDoublyLinkedList([]);
-var polygon = L.polygon([]).addTo(map);
+var poly_coords = [];
+var leaflet_id_to_poly_id = {}; // THIS NEEDS TO BE IMPLEMENTED THROUGHOUT THE PROGRAM SO THAT NODES CAN BE DELETED
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 	maxZoom: 20, /* changed from original 18*/
@@ -14,6 +10,8 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 		'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
 	id: 'mapbox.satellite'
 }).addTo(map);
+
+var poly_shape = L.polygon([]).addTo(map);
 
 function onMarkerClick(e) {
 	var id = e.target._leaflet_id;
@@ -33,37 +31,17 @@ function onMarkerDrag(e){
 	
 }
 
-
-
 function onMapClick(e) {
 	var marker = L.marker(e.latlng, {draggable: 'true', title: e.latlng, autoPan: 'true', autoPanPadding: [60, 50]}).addTo(map).on('click', onMarkerClick);
 	// add to existing polygon
 	
-	// prompt python with the latlng value
-	// find closest edge in polygon
-	// add point in this edge
-	// pass back up to js
-	// get rid of js classes, they would be better suited in python
-	
-	
-	
-	
-	
-	
-	
-	
-	polycoords.insert_end(e.latlng);
-	latlngs[marker._leaflet_id] = marker._latlng;
-	//alert(e.latlng);
-	//polycoords.push(e.latlng);
-	
-	//  _leaflet_id
-	
-	map.removeLayer(polygon);
-	marker.on('drag', onMarkerDrag);
-	marker.on('dragend', onMarkerDrag);
-	polygon = L.polygon(polycoords.listify()).addTo(map);
-	
+	$.getJSON('/onMapClick',{poly: poly_coords.toString(), lat: e.latlng.lat, lng: e.latlng.lng}, function(data) {
+		poly_coords = data
+		map.removeLayer(poly_shape);
+		marker.on('drag', onMarkerDrag);
+		marker.on('dragend', onMarkerDrag);
+		poly_shape = L.polygon(poly_coords).addTo(map);
+	});
 }
 
 // originalEvent,containerPoint,layerPoint,latlng,type,target,sourceTarget

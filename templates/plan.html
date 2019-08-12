@@ -1,37 +1,6 @@
 
 {% extends "index.html" %}
 {% block content %}
-	
-	<script type=text/javascript>
-			$(function() {
-			  $('li#bird').bind('click', function() {
-				
-				$.getJSON('/background_process_test',
-                function(data) {
-					alert("askndoajs");
-				});
-				return false;
-			  });
-			});
-	</script>
-
-<!--
-	//button
-	<div class='container'>
-		<h3>Test</h3>
-			<form>
-				<a href=# id=test><button class='btn btn-default'>Test</button></a>
-			</form>
-
-	</div>-->
-
-
-
-
-
-
-
-
 
 		<div id="mapid">
 			<!--div id="alt_slider><div id="slider-vertical" style="height:100%;"></div></div-->
@@ -43,8 +12,7 @@
 				<li id="bird" style='background-image: url("static/images/ic_bird.png")'><a onclick=''></a></li>
 			</ul>
 		</div>
-		<script src="static/js/classes.js"></script>
+		<!--script src="static/js/classes.js"></script-->
 		<script src="static/js/script.js"></script>
-	
 
 {% endblock %}
