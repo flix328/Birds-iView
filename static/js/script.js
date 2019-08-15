@@ -47,33 +47,7 @@ function onMapClick(e) {
 // originalEvent,containerPoint,layerPoint,latlng,type,target,sourceTarget
 
 
-//map.on('click', onMapClick);
-
-var dbl_click_timeout = 170; // in milliseconds
-var click_start = 0;
-var num_clicks = 0;
-map.on('click', function(event){
-	var d = new Date();
-	var cur_time = d.getTime();
-	
-	if(cur_time - click_start > dbl_click_timeout){
-		num_clicks = 1;
-		click_start = cur_time;
-		setTimeout(function () {
-					if(num_clicks == 1){
-						onMapClick(event);
-					}}, dbl_click_timeout);
-	}
-	else {
-		click_start = cur_time;
-		num_clicks++;
-		map.zoomIn();
-	}
-	
-	click_start = cur_time;
-});
-
-
+map.on('click', onMapClick);
 
 
 
