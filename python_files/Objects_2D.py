@@ -194,6 +194,5 @@ class LineSegment():
                        min(S.p0.y, S.p1.y) <= p.y <= max(S.p0.y, S.p1.y))
         return is_on_line and is_in_range
 
-
 if __name__ == "__main__":
     print("This is just a handy module with points and lines.\nHave a nice day!")

@@ -1,7 +1,7 @@
 var map = L.map('mapid').setView([0, 0], 2);
+map.doubleClickZoom.disable(); 
 
 var poly_coords = [];
-var leaflet_id_to_poly_id = {}; // THIS NEEDS TO BE IMPLEMENTED THROUGHOUT THE PROGRAM SO THAT NODES CAN BE DELETED
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 	maxZoom: 20, /* changed from original 18*/
@@ -25,31 +25,36 @@ function onMarkerClick(e) {
 
 function onMarkerDrag(e){
 	// use e.oldLatLng;
-	polycoords.update_value(e.oldLatLng, e.latlng);
 	map.removeLayer(polygon);
+	
 	polygon = L.polygon(polycoords.listify()).addTo(map);
 	
 }
 
 function onMapClick(e) {
-	var marker = L.marker(e.latlng, {draggable: 'true', title: e.latlng, autoPan: 'true', autoPanPadding: [60, 50]}).addTo(map).on('click', onMarkerClick);
-	// add to existing polygon
+	var marker = L.marker(e.latlng, {draggable: 'true', title: e.latlng, autoPan: 'true', autoPanPadding: [60, 50]})
+	marker.addTo(map)
+	marker.on('click', onMarkerClick);
 	
-	$.getJSON('/onMapClick',{poly: poly_coords.toString(), lat: e.latlng.lat, lng: e.latlng.lng}, function(data) {
+	// marker._leaflet_id, marker._latlng
+	//alert(marker._latlng)
+	//alert(marker._latlng.lat)
+	//alert(marker._latlng.lng)
+	
+	
+	$.getJSON('/onMapClick',{poly: poly_coords.toString(), lat: e.latlng.lat, lng: e.latlng.lng, _id: marker._leaflet_id}, function(data) {
 		poly_coords = data
 		map.removeLayer(poly_shape);
-		marker.on('drag', onMarkerDrag);
-		marker.on('dragend', onMarkerDrag);
+		//marker.on('drag', onMarkerDrag);
+		//marker.on('dragend', onMarkerDrag);
 		poly_shape = L.polygon(poly_coords).addTo(map);
 	});
+	
+	
 }
-
-// originalEvent,containerPoint,layerPoint,latlng,type,target,sourceTarget
-
-
 map.on('click', onMapClick);
 
-
+// originalEvent,containerPoint,layerPoint,latlng,type,target,sourceTarget
 
 
 var controlID = document.getElementById("controls");

@@ -32,24 +32,16 @@ from interface import *
 # map click function happening without any refreshing
 @app.route('/onMapClick')
 def polygon_add():
-	print("A")
-	poly = request.args['poly']
-	
-	print("start", repr(poly))
-	poly = format_input_poly(poly)
-	print("end", repr(poly))	
-	
-	print("B")
+	data = request.args['poly']
+	poly = format_input_data(data)
 	
 	lat = float(request.args['lat'])
 	lon = float(request.args['lng'])
+	_id = float(request.args['_id'])
 	p = Objects_2D.Point(lat, lon)
-
-	print("C")	
-	poly = add_point(poly, p)
-	print([(p.x,p.y) for p in poly])
-	print("D")
-	return jsonify([(p.x,p.y) for p in poly])
+	
+	poly.push(_id, p)
+	return jsonify(poly.listify())
 
 
 
