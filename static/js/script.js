@@ -1,7 +1,7 @@
-var map = L.map('mapid').setView([0, 0], 2);
+var map = L.map('mapid').setView([-10.8669988,27.0927838], 11);
 map.doubleClickZoom.disable(); 
 
-var poly_coords = [];
+var poly_data = [];
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 	maxZoom: 20, /* changed from original 18*/
@@ -14,20 +14,53 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 var poly_shape = L.polygon([]).addTo(map);
 
 function onMarkerClick(e) {
-	var id = e.target._leaflet_id;
-	var latlng = id_to_latlng[id];
-	polycoords.delete_value(e.latlng);
-	map.removeLayer(polygon);
-	polygon = L.polygon(polycoords.listify()).addTo(map);
-    map.removeLayer(this);
+	var _id = e.target._leaflet_id;
+	var i = 0;
+	result = [];
+	poly = [];
+	for (var i = 0; i < poly_data.length; i=i+1) {
+		if(poly_data[i][0] != _id){
+			result.push(poly_data[i]);
+			poly.push([poly_data[i][1],poly_data[i][2]]);
+		}
+	}
+	poly_data = result;
+	map.removeLayer(poly_shape);
+	map.removeLayer(e.target);
+	poly_shape = L.polygon(poly).addTo(map);
 }
 
 
-function onMarkerDrag(e){
-	// use e.oldLatLng;
-	map.removeLayer(polygon);
+
+function onMarkerDragend(e){
+	_id = e.target._leaflet_id
 	
-	polygon = L.polygon(polycoords.listify()).addTo(map);
+	poly = [];
+	for (var i = 0; i < poly_data.length; i=i+1) {
+		if(poly_data[i][0] == _id){
+			poly_data[i][1] = e.target._latlng.lat
+			poly_data[i][2] = e.target._latlng.lng
+		}
+		poly.push([poly_data[i][1], poly_data[i][2]]);
+	}
+	map.removeLayer(poly_shape);
+	poly_shape = L.polygon(poly).addTo(map);
+	
+	
+	//i = 0;
+	//while(poly_data[i][0] != _id){
+		//if(i == poly_data.length -1){
+		//	alert(_id)
+		//	alert(poly_data)
+		//}
+		//i=i+1;
+	//}
+	//poly_data[i][1] = e.target._latlng.lat
+	//poly_data[i][2] = e.target._latlng.lng
+	
+	//map.removeLayer(polygon);
+	
+	//polygon = L.polygon(polycoords.listify()).addTo(map);
 	
 }
 
@@ -42,12 +75,21 @@ function onMapClick(e) {
 	//alert(marker._latlng.lng)
 	
 	
-	$.getJSON('/onMapClick',{poly: poly_coords.toString(), lat: e.latlng.lat, lng: e.latlng.lng, _id: marker._leaflet_id}, function(data) {
-		poly_coords = data
+	$.getJSON('/onMapClick',{poly: poly_data.toString(), lat: e.latlng.lat, lng: e.latlng.lng, _id: marker._leaflet_id}, function(data) {
+		data = data.toString().split(",");
+		for(var i = 0; i < data.length; i=i+1){
+			data[i] = parseFloat(data[i]);
+		}
+		poly = [];
+		poly_data = [];
+		for (var i = 0; i < data.length; i=i+3) {
+			poly.push([data[i+1], data[i+2]]);
+			poly_data.push([data[i], data[i+1], data[i+2]]);
+		}
 		map.removeLayer(poly_shape);
 		//marker.on('drag', onMarkerDrag);
-		//marker.on('dragend', onMarkerDrag);
-		poly_shape = L.polygon(poly_coords).addTo(map);
+		marker.on('dragend', onMarkerDragend);
+		poly_shape = L.polygon(poly).addTo(map);
 	});
 	
 	

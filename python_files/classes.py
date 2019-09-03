@@ -2,7 +2,8 @@ from Objects_2D import *
 
 
 class Node():
-    def __init__(self, data):
+    def __init__(self, _id, data):
+        self._id = _id
         self.data = data
         self.next = None
         self.prev = None
@@ -26,13 +27,13 @@ class Polygon():
     def push_end(poly, _id, data):
         ''' if poly is empty, create head, else add behind head '''
         if poly.head == None:
-            poly.head = Node(data)
+            poly.head = Node(_id, data)
             poly.head.prev = poly.head.next = poly.head
             poly._id_node[_id] = poly.head
         else:
             if _id in poly._id_node.keys():
                 raise ValueError("Cannot add the same id twice")
-            new_node = Node(data)
+            new_node = Node(_id, data)
             new_node.prev = poly.head.prev
             new_node.next = poly.head
             poly.head.prev.next = new_node
@@ -43,7 +44,7 @@ class Polygon():
         if(node0.next != node1):
             raise ValueError("cannot push between {} and {} as they are not adjacent".format(v0, v1))
         
-        new_node = Node(data)
+        new_node = Node(_id, data)
         new_node.prev = node0
         new_node.next = node1
         node0.next = new_node
@@ -71,10 +72,10 @@ class Polygon():
         poly.length -= 1
     def listify(poly):
         if poly.head:
-            result = [(poly.head.data.x, poly.head.data.y)]
+            result = [(poly.head._id, poly.head.data.x, poly.head.data.y)]
             node = poly.head.next
             while node != poly.head:
-                result.append((node.data.x, node.data.y))
+                result.append((node._id, node.data.x, node.data.y))
                 node = node.next
         else:
             result= []

@@ -14,8 +14,13 @@ def edge_point_dist(S, p):
 def format_input_data(data):
     poly = Polygon()
     split = data.split(',')
-    if split != ['']:
-        nums = [float(num) for num in data.split(',')]
-        for i in range(0, len(nums), 2):
-            poly.push(Point(nums[i], nums[i+1]))
+    nums = []
+    for value in split:
+        try:
+            nums.append(float(value))
+        except ValueError:
+            continue
+    print("ASdlSD", poly)
+    for i in range(0, len(nums), 3):
+        poly.push_end(nums[i], Point(nums[i+1], nums[i+2]))
     return poly
