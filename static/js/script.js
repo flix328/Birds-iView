@@ -1,5 +1,6 @@
-var map = L.map('mapid').setView([-10.8669988,27.0927838], 11);
+var map = L.map('mapid').setView([-43.4651629,172.6058556], 17);
 map.doubleClickZoom.disable(); 
+map.on('click', onMapClick);
 
 var poly_data = [];
 
@@ -28,9 +29,9 @@ function onMarkerClick(e) {
 	map.removeLayer(poly_shape);
 	map.removeLayer(e.target);
 	poly_shape = L.polygon(poly).addTo(map);
+	
+	update_path();
 }
-
-
 
 function onMarkerDragend(e){
 	_id = e.target._leaflet_id
@@ -46,34 +47,13 @@ function onMarkerDragend(e){
 	map.removeLayer(poly_shape);
 	poly_shape = L.polygon(poly).addTo(map);
 	
-	
-	//i = 0;
-	//while(poly_data[i][0] != _id){
-		//if(i == poly_data.length -1){
-		//	alert(_id)
-		//	alert(poly_data)
-		//}
-		//i=i+1;
-	//}
-	//poly_data[i][1] = e.target._latlng.lat
-	//poly_data[i][2] = e.target._latlng.lng
-	
-	//map.removeLayer(polygon);
-	
-	//polygon = L.polygon(polycoords.listify()).addTo(map);
-	
+	update_path();
 }
 
 function onMapClick(e) {
 	var marker = L.marker(e.latlng, {draggable: 'true', title: e.latlng, autoPan: 'true', autoPanPadding: [60, 50]})
 	marker.addTo(map)
 	marker.on('click', onMarkerClick);
-	
-	// marker._leaflet_id, marker._latlng
-	//alert(marker._latlng)
-	//alert(marker._latlng.lat)
-	//alert(marker._latlng.lng)
-	
 	
 	$.getJSON('/onMapClick',{poly: poly_data.toString(), lat: e.latlng.lat, lng: e.latlng.lng, _id: marker._leaflet_id}, function(data) {
 		data = data.toString().split(",");
@@ -87,17 +67,31 @@ function onMapClick(e) {
 			poly_data.push([data[i], data[i+1], data[i+2]]);
 		}
 		map.removeLayer(poly_shape);
-		//marker.on('drag', onMarkerDrag);
 		marker.on('dragend', onMarkerDragend);
 		poly_shape = L.polygon(poly).addTo(map);
+		update_path();
 	});
 	
+}
+
+var path_data = [];
+var path_shape = L.polyline([], {color: 'red'}).addTo(map);
+
+function update_path(){
+	$.getJSON('/updatePath',{poly: poly_data.toString()}, function(data) {
+		data = data.toString().split(",");
+		bearing = parseFloat(data[0]);
+		path = [];
+		for(var i = 1; i < data.length; i=i+2){
+			lat = parseFloat(data[i]);
+			lng = parseFloat(data[i+1]);
+			path.push([lat, lng]);
+		}
+		map.removeLayer(path_shape);
+		path_shape = L.polyline(path, {color: 'red'}).addTo(map);
+	});
 	
 }
-map.on('click', onMapClick);
-
-// originalEvent,containerPoint,layerPoint,latlng,type,target,sourceTarget
-
 
 var controlID = document.getElementById("controls");
 L.DomEvent.disableClickPropagation(controlID); 

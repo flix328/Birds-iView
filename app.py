@@ -27,6 +27,8 @@ sys.path.append(os.path.join(CURRENT_DIRECTORY, 'python_files'))
 
 import Objects_GPS
 import Objects_2D
+from plan_flight import *
+from earth_view import *
 from interface import *
 
 # map click function happening without any refreshing
@@ -43,7 +45,29 @@ def polygon_add():
 	poly.push(_id, p)
 	return jsonify(poly.listify())
 
-
+# map click function happening without any refreshing
+@app.route('/updatePath')
+def get_path():
+	data = request.args['poly']
+	poly = format_input_data(data)
+	
+	gs = [Objects_GPS.Point(lat, lng) for _, lat, lng in poly.listify()]
+	# convert GPS points to 2D points
+	p3Ds = [gps_to_xyz(g) for g in gs]
+	p_r = EARTH.project(centre_point(p3Ds))
+	ps = [xyz_to_xy(p_r, p) for p in p3Ds]	
+	
+	altitude = 50
+	overlap = 0
+	camera = {"view angle": 58, "resolution": "640x480"}
+	
+	flight_plan, bearing = generate_flight_plan(ps, camera, altitude, overlap)
+	result = ""
+	for p in flight_plan:
+		g = xy_to_gps(p_r, p)
+		result += ", " + str(g.lat) + ", " + str(g.lon)
+	result = str(bearing) + result
+	return jsonify(result)
 
 
 # This function deals with any missing pages and shows the Error page

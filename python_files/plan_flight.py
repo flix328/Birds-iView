@@ -355,6 +355,9 @@ def split_edge(edge, width):
     return points
 
 def generate_flight_plan(poly, camera, altitude, overlap):
+    if len(poly) < 3:
+        return [], 0
+    
     # unpack values
     R_w, R_h = camera["resolution"].split('x')
     R_w, R_h = int(R_w), int(R_h)

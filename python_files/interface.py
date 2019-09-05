@@ -20,7 +20,6 @@ def format_input_data(data):
             nums.append(float(value))
         except ValueError:
             continue
-    print("ASdlSD", poly)
     for i in range(0, len(nums), 3):
         poly.push_end(nums[i], Point(nums[i+1], nums[i+2]))
     return poly
