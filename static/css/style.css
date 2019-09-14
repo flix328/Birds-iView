@@ -58,9 +58,6 @@ p {
 
 
 
-
-
-
 main {
 	width: 100%;
 	height: calc( 100% - 62px );
@@ -146,7 +143,6 @@ main {
 	text-align: center;
 }
 
-
 #alt_val input {
 	border: 0px;
 	width: 30px;
@@ -154,7 +150,7 @@ main {
 	text-align: center;
 	font-family: 'Arial', sans-serif;
 	font-weight: bold;
-	font-size: 14px;
+	font-size: 12px;
 }
 
 #slider-vertical {

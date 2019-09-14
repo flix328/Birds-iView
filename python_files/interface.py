@@ -14,12 +14,14 @@ def edge_point_dist(S, p):
 def format_input_data(data):
     poly = Polygon()
     split = data.split(',')
+    print(split)
+    altitude = float(split[0])
     nums = []
-    for value in split:
+    for value in split[1:]:
         try:
             nums.append(float(value))
         except ValueError:
             continue
     for i in range(0, len(nums), 3):
         poly.push_end(nums[i], Point(nums[i+1], nums[i+2]))
-    return poly
+    return altitude, poly

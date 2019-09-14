@@ -78,7 +78,7 @@ class Polygon():
                 result.append((node._id, node.data.x, node.data.y))
                 node = node.next
         else:
-            result= []
+            result = []
         return result
     def __str__(poly):
         return str(poly.listify())
