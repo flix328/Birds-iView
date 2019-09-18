@@ -91,7 +91,8 @@ function onMapClick(e) {
 }
 
 var path_data = [];
-var path_shape = L.polyline([], {color: '#FF3B3F'}).addTo(map);
+var path_keys = {color: '#FF3B3F', dashArray: "12 6"};
+var path_shape = L.polyline([], path_keys).addTo(map);
 
 $( function() {
 	$( "#slider-vertical" ).slider({
@@ -113,7 +114,7 @@ $( function() {
 } );
 
 function update_path(){
-	var altitude = $("#slider-vertical").slider("value");
+	var altitude = 60;//$("#slider-vertical").slider("value");
 	var out_str = altitude.toString() + ", " + poly_data.toString();
 	
 	$.getJSON('/updatePath',{data: out_str}, function(data) {
@@ -126,7 +127,7 @@ function update_path(){
 			path.push([lat, lng]);
 		}
 		map.removeLayer(path_shape);
-		path_shape = L.polyline(path, {color: '#FF3B3F'}).addTo(map);
+		path_shape = L.polyline(path, path_keys).addTo(map);
 	});
 	
 }
@@ -135,3 +136,8 @@ var controlID = document.getElementById("controls");
 L.DomEvent.disableClickPropagation(controlID); 
 L.DomEvent.disableScrollPropagation(controlID); 
 
+
+
+function clicky(){
+	alert("yeet");
+}

@@ -57,7 +57,6 @@ p {
 
 
 
-
 main {
 	width: 100%;
 	height: calc( 100% - 62px );
@@ -69,34 +68,43 @@ main {
 	z-index: 500;
 }
 
-#mapid ul {
+#controls {
+	/*width: 80px;
+	height: 500px;*/
+	display: block;
 	position: absolute;
-	margin: 0;
-	padding: 0;
+	bottom:1em;
+	left:1em;
 	z-index: 401;
-	bottom:1.2em;
-	right:0.6em;
+	margin: 0;
+	padding: 5px;
+	border-radius: 5px;
 	list-style: none;
+	background-color: white;
+	text-align: center;
 }
 
-#mapid ul li{
+#controls li{
 	display: block;
 	overflow: hidden;
-	width: 35px;
+	width: 50px;
+	height: 50px;
 	background-color: white;
 	background-repeat: no-repeat;
-	/*background-attachment: fixed;*/
+	//background-attachment: fixed;
 	background-position: 50% 50%;
+	background-size: contain;
 }
 
-/*#mapid ul li a:hover{
-	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
-}*/
+#controls li:not(:last-child){
+	margin: 0 0 3px 0;
+}
 
-#mapid ul li a{
+#controls li a{
 	display: block;
+	padding-top: 100px;
 }
-
+/*
 #altitude {
 	height: 34px;
 	border-radius: 10px 10px 10px 10px;
@@ -156,4 +164,4 @@ main {
 #slider-vertical {
 	margin: 15px auto;
 	height: 170px;
-}
+}*/
