@@ -57,6 +57,7 @@ p {
 
 
 
+
 main {
 	width: 100%;
 	height: calc( 100% - 62px );
@@ -69,99 +70,90 @@ main {
 }
 
 #controls {
-	/*width: 80px;
-	height: 500px;*/
 	display: block;
 	position: absolute;
-	bottom:1em;
-	left:1em;
+	bottom: 1em;
+	left: 1em;
 	z-index: 401;
 	margin: 0;
-	padding: 5px;
-	border-radius: 5px;
+	padding: 0;
 	list-style: none;
-	background-color: white;
 	text-align: center;
 }
 
-#controls li{
+controls > li{
 	display: block;
-	overflow: hidden;
-	width: 50px;
-	height: 50px;
+	position: relative;
+}
+
+#controls > li:not(:last-child){
+	margin: 0 0 15px 0;
+}
+
+#controls > li > ul{
+	display: block;
+	list-style: none;
+	text-align: center;
+	padding: 0;
+	background-color: white;
+	border-radius: 5px;
+	padding: 5px;
+}
+
+#controls > li > ul > li{
+	width: 40px;
+	height: 40px;
+	
 	background-color: white;
 	background-repeat: no-repeat;
 	//background-attachment: fixed;
 	background-position: 50% 50%;
 	background-size: contain;
+	
 }
 
-#controls li:not(:last-child){
-	margin: 0 0 3px 0;
+#controls > li > ul > li:not(:last-child){
+	margin: 0 0 4px 0;
 }
 
-#controls li a{
-	display: block;
+#controls > li > ul > li > a{
 	padding-top: 100px;
-}
-/*
-#altitude {
-	height: 34px;
-	border-radius: 10px 10px 10px 10px;
-	margin: 0 0 0.6em 0;
-	border:1px solid #e3e3e3;
-	
-	border-top:0px;
-	border-radius: 0 0 10px 10px;
-	padding: 5px;
-	
-	
-}
-#camera {
-	height: 34px;
-	border-radius: 10px 10px 10px 10px;
-	margin: 0.6em 0;
-	padding: 5px;
-	border:1px solid #e3e3e3;}
-#bird {
-	height: 34px;
-	border-radius: 10px 10px 10px 10px;
-	padding: 5px;
-	margin: 0.6em 0;}
-
-#alt_slider {
-	height: 200px;
-	border-radius: 10px 10px 0 0;
-	margin: 0;
-	padding: 5px;
-	border-left:1px solid #e3e3e3;
-	border-top:1px solid #e3e3e3;
-	border-right:1px solid #e3e3e3;
-}
-#alt_val {
-	height: 25px;
-	border-radius: 0;
-	
-	margin: 0;
-	padding: 0;
-	padding: 0 5px;
-	border-left:1px solid #e3e3e3;
-	border-right:1px solid #e3e3e3;
-	line-height: 25px;
-	text-align: center;
+	display: block;
+	position: relative;
 }
 
-#alt_val input {
-	border: 0px;
-	width: 30px;
-	margin: 0;
-	text-align: center;
-	font-family: 'Arial', sans-serif;
-	font-weight: bold;
-	font-size: 12px;
+#controls > li > ul > li > a span{
+	display: none;
+	position: absolute;
+	left: 50px;
+	top: 10px;
+	text-decoration: none;
+	font-family: 'Josefin Sans', sans-serif;
+	font-size: 13px;
+	font-weight: bolder;
+	text-decoration: none;
+	background-color: white;
+	border-radius: 3px;
+	padding: 2px 4px;
+	height: 20px;
+	line-height: 20px;
+	color: #6a6a6a;
+	white-space: nowrap;
+	z-index:511;
 }
 
-#slider-vertical {
-	margin: 15px auto;
-	height: 170px;
-}*/
+#controls > li > ul > li:hover a span{
+	display: block;
+}
+
+#altitude_box{
+	width:50px;
+	height:226px;
+	background-color:white;
+	z-index:510;
+	display: block;
+	position: absolute;
+	top:65px;
+	left:50px;
+	border-radius: 0 5px 5px 0;
+}

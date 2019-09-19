@@ -1,4 +1,4 @@
-var map = L.map('mapid').setView([-43.4651629,172.6058556], 17);
+var map = L.map('mapid').setView([-43,173], 18);
 map.doubleClickZoom.disable(); 
 map.on('click', onMapClick);
 
@@ -26,6 +26,7 @@ var blueIcon = L.icon({
 });
 
 var marker_keys = {icon: blueIcon, draggable: 'true', autoPan: 'true', autoPanPadding: [60, 50]};
+var markerGroup = L.layerGroup().addTo(map);
 var poly_keys = {fillColor: '#3d8ea1', fillOpacity: 0.2, color: '#3d8ea1'};
 var poly_shape = L.polygon([], poly_keys).addTo(map);
 
@@ -66,8 +67,7 @@ function onMarkerDragend(e){
 }
 
 function onMapClick(e) {
-	var marker = L.marker(e.latlng, Object.assign({}, marker_keys, {title: e.latlng}));
-	marker.addTo(map);
+	var marker = L.marker(e.latlng, Object.assign({}, marker_keys, {title: e.latlng})).addTo(markerGroup);
 	marker.on('click', onMarkerClick);
 	var out_str = "0, " + poly_data.toString();
 	
@@ -94,25 +94,6 @@ var path_data = [];
 var path_keys = {color: '#FF3B3F', dashArray: "12 6"};
 var path_shape = L.polyline([], path_keys).addTo(map);
 
-$( function() {
-	$( "#slider-vertical" ).slider({
-		orientation: "vertical",
-		range: "min",
-		min: 20,
-		max: 120,
-		value: 60,
-		slide: function( event, ui ) {
-			document.getElementById("amount").value = ui.value.toString() + "m";
-		},
-		stop: function( event, ui ) {
-			update_path();
-		},
-		create: function( event, ui ) {
-			document.getElementById("amount").value = "60m";
-		}
-    });
-} );
-
 function update_path(){
 	var altitude = 60;//$("#slider-vertical").slider("value");
 	var out_str = altitude.toString() + ", " + poly_data.toString();
@@ -138,6 +119,37 @@ L.DomEvent.disableScrollPropagation(controlID);
 
 
 
-function clicky(){
-	alert("yeet");
+function clearAll() {
+	map.removeLayer(markerGroup);
+	markerGroup = L.layerGroup().addTo(map);
+	poly_data = [];
+	map.removeLayer(poly_shape);
+	poly_shape = L.polygon([], poly_keys).addTo(map);
+	path_data = [];
+	map.removeLayer(path_shape);
+	path_shape = L.polyline([], path_keys).addTo(map);
 }
+
+var adjusting_altitude = false;
+
+
+
+
+$( function() {
+	$( "#altitude_slider" ).slider({
+		orientation: "vertical",
+		range: "min",
+		min: 20,
+		max: 120,
+		value: 60/*,
+		slide: function( event, ui ) {
+			document.getElementById("amount").value = ui.value.toString() + "m";
+		},
+		stop: function( event, ui ) {
+			update_path();
+		},
+		create: function( event, ui ) {
+			document.getElementById("amount").value = "60m";
+		}*/
+    });
+} );

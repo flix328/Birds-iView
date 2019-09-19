@@ -4,13 +4,25 @@
 
 		<div id="mapid">
 			<ul id="controls">
-				<li id="delete_btn" style='background-image: url("static/images/ic_delete.png")'><a onclick='alert("delet this")'></a></li>
-				<li id="altitude_btn" style='background-image: url("static/images/ic_altitude.png")'><a onclick='alert("altitude")'></a></li>
-				<li id="heading_btn" style='background-image: url("static/images/ic_heading.png")'><a onclick='alert("heading")'></a></li>
-				<li id="overlap_btn" style='background-image: url("static/images/ic_overlap.png")'><a onclick='alert("overlap")'></a></li>
-				<li id="camera_btn" style='background-image: url("static/images/ic_camera.png")'><a onclick='alert("camera")'></a></li>
-				<li id="birds_btn" style='background-image: url("static/images/ic_bird.png")'><a onclick='alert("birds")'></a></li>
-				<li id="export_btn" style='background-image: url("static/images/ic_export.png")'><a onclick='alert("export")'></a></li>
+				<li id="delete_group"><ul>
+					<li id="delete_btn" style='background-image: url("static/images/ic_delete.png")'><a onclick='clearAll()'><span>Clear</span></a></li>
+				</ul></li>
+				<li id="adjust_group">
+					<ul>
+						<li id="altitude_btn" style='background-image: url("static/images/ic_altitude.png")'><a onclick='alert("altitude")'><span>Altitude</span></a></li>
+						<li id="heading_btn" style='background-image: url("static/images/ic_heading.png")'><a onclick='alert("heading")'><span>Heading</span></a></li>
+						<li id="overlap_btn" style='background-image: url("static/images/ic_overlap.png")'><a onclick='alert("overlap")'><span>Overlap</span></a></li>
+						<li id="camera_btn" style='background-image: url("static/images/ic_camera.png")'><a onclick='alert("camera")'><span>Camera Settings</span></a></li>
+						<li id="birds_btn" style='background-image: url("static/images/ic_bird.png")'><a onclick='alert("birds")'><span>Birds</span></a></li>
+					</ul>
+					<div id="altitude_box">
+						<div id="altitude_slider"></div>
+					</div>
+				</li>
+				<li id="export_group"><ul>
+					<li id="export_btn" style='background-image: url("static/images/ic_export.png")'><a onclick='alert("export")'><span>Export</span></a></li>
+				</ul></li>
+				
 			</ul>
 		</div>
 		<script src="static/js/script.js"></script>
