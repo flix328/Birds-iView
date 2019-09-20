@@ -83,7 +83,7 @@ main {
 
 controls > li{
 	display: block;
-	position: relative;
+	position: absolute;
 }
 
 #controls > li:not(:last-child){
@@ -94,30 +94,38 @@ controls > li{
 	display: block;
 	list-style: none;
 	text-align: center;
-	padding: 0;
 	background-color: white;
 	border-radius: 5px;
-	padding: 5px;
+	padding: 0;
+	margin: 0;
 }
 
 #controls > li > ul > li{
-	width: 40px;
-	height: 40px;
+	width: 44px;
+	height: 44px;
 	
 	background-color: white;
 	background-repeat: no-repeat;
-	//background-attachment: fixed;
+	
 	background-position: 50% 50%;
-	background-size: contain;
+	background-size: 40px 40px;
 	
 }
 
-#controls > li > ul > li:not(:last-child){
-	margin: 0 0 4px 0;
+
+
+#controls > li > ul > li:first-child{
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+#controls > li > ul > li:last-child{
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
 }
 
+
 #controls > li > ul > li > a{
-	padding-top: 100px;
+	padding-top: 50px;
 	display: block;
 	position: relative;
 }
@@ -125,8 +133,8 @@ controls > li{
 #controls > li > ul > li > a span{
 	display: none;
 	position: absolute;
-	left: 50px;
-	top: 10px;
+	left: 54px;
+	top: 12px;
 	text-decoration: none;
 	font-family: 'Josefin Sans', sans-serif;
 	font-size: 13px;
@@ -146,14 +154,162 @@ controls > li{
 	display: block;
 }
 
-#altitude_box{
+#altitude_box {
 	width:50px;
-	height:226px;
-	background-color:white;
-	z-index:510;
-	display: block;
-	position: absolute;
-	top:65px;
-	left:50px;
+	height: 220px;
+	background-color: white;
 	border-radius: 0 5px 5px 0;
+	position: absolute;
+	top:59px;
+	left:44px;
+	display: none;
+}
+
+#altitude_slider{
+	margin: 16px auto 0 auto;
+	height:160px;
+}
+
+#altitude_value{
+	border: 0px;
+	width: 30px;
+	margin: 14px auto;
+	text-align: center;
+	font-family: 'Arial', sans-serif;
+	font-weight: bold;
+	font-size: 12px;
+}
+
+#heading_box {
+	width:50px;
+	height: 220px;
+	background-color: white;
+	border-radius: 0 5px 5px 0;
+	position: absolute;
+	top:59px;
+	left:44px;
+	display: none;
+}
+
+#heading_slider{
+	margin: 16px auto 0 auto;
+	height:160px;
+}
+
+#heading_value{
+	border: 0px;
+	width: 30px;
+	margin: 14px auto;
+	text-align: center;
+	font-family: 'Arial', sans-serif;
+	font-weight: bold;
+	font-size: 12px;
+}
+
+#overlap_box {
+	width:50px;
+	height: 220px;
+	background-color: white;
+	border-radius: 0 5px 5px 0;
+	position: absolute;
+	top:59px;
+	left:44px;
+	display: none;
+}
+
+#overlap_slider{
+	margin: 16px auto 0 auto;
+	height:160px;
+}
+
+#overlap_value{
+	border: 0px;
+	width: 30px;
+	margin: 14px auto;
+	text-align: center;
+	font-family: 'Arial', sans-serif;
+	font-weight: bold;
+	font-size: 12px;
+}
+
+#camera_box {
+	width:90px;
+	height: 100px;
+	background-color: white;
+	border-radius: 0 5px 5px 0;
+	position: absolute;
+	top:169px;
+	left:44px;
+	display: none;
+}
+
+#camera_box h6 {
+	font-family: 'Josefin Sans', sans-serif;
+	font-weight: bold;
+	font-size: 11px;
+	margin: 7px 0 1px 0;
+}
+#camera_box input {
+	width: 65px;
+	padding: 3px;
+	font-family: 'Arial', sans-serif;
+	font-size: 11px;
+}
+
+#bird_box {
+	width:228px;
+	height: 220px;
+	background-color: white;
+	border-radius: 0 5px 5px 0;
+	position: absolute;
+	top:59px;
+	left:44px;
+	display: none;
+}
+
+#bird_box input {
+	padding: 5px;
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+}
+
+#bird_input {
+	width: 200px;
+	background-color: white;/*#f2f2f2;*/
+	border: 1px solid #e3e3e3;
+	margin: 10px 0 0 0;
+}
+
+#bird_box input:focus {
+    outline-width: 0;
+}
+
+#bird_complete{
+	width: 200px;
+	margin: 0;
+	background-color: white;
+	border-color: #e3e3e3;
+	border-top-width: 0;
+	border-left-width: 1px;
+	border-bottom-width: 1px;
+	border-right-width: 1px;
+	border-style: solid;
+	visibility: hidden;
+}
+
+#bird_list{
+	background-color: white;/*#f2f2f2;*/
+	border: 1px solid #e3e3e3;
+	margin: 10px auto;
+	width: 200px;
+	height: 123px;
+	padding: 5px;
+	list-style: none;
+	text-align: left;
+	overflow-y: scroll;
+}
+
+#bird_list li {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
 }

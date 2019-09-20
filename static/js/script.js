@@ -1,4 +1,4 @@
-var map = L.map('mapid').setView([-43,173], 18);
+var map = L.map('mapid').setView([-43.505835, 172.577879], 18);
 map.doubleClickZoom.disable(); 
 map.on('click', onMapClick);
 
@@ -119,16 +119,7 @@ L.DomEvent.disableScrollPropagation(controlID);
 
 
 
-function clearAll() {
-	map.removeLayer(markerGroup);
-	markerGroup = L.layerGroup().addTo(map);
-	poly_data = [];
-	map.removeLayer(poly_shape);
-	poly_shape = L.polygon([], poly_keys).addTo(map);
-	path_data = [];
-	map.removeLayer(path_shape);
-	path_shape = L.polyline([], path_keys).addTo(map);
-}
+
 
 var adjusting_altitude = false;
 
@@ -138,18 +129,208 @@ var adjusting_altitude = false;
 $( function() {
 	$( "#altitude_slider" ).slider({
 		orientation: "vertical",
-		range: "min",
+		range: false,
 		min: 20,
 		max: 120,
-		value: 60/*,
-		slide: function( event, ui ) {
-			document.getElementById("amount").value = ui.value.toString() + "m";
+		value: 60,
+		create: function( event, ui ) {
+			document.getElementById("altitude_value").value = "60m";
 		},
+		slide: function( event, ui ) {
+			document.getElementById("altitude_value").value = ui.value.toString() + "m";
+		}/*,
 		stop: function( event, ui ) {
 			update_path();
 		},
-		create: function( event, ui ) {
-			document.getElementById("amount").value = "60m";
-		}*/
+		*/
     });
 } );
+
+$( function() {
+	$( "#heading_slider" ).slider({
+		orientation: "vertical",
+		range: false,
+		min: 0,
+		max: 360,
+		value: 0,
+		create: function( event, ui ) {
+			document.getElementById("heading_value").value = "0°";
+		},
+		slide: function( event, ui ) {
+			document.getElementById("heading_value").value = ui.value.toString() + "°";
+		}/*,
+		stop: function( event, ui ) {
+			update_path();
+		},
+		*/
+    });
+} );
+
+$( function() {
+	$( "#overlap_slider" ).slider({
+		orientation: "vertical",
+		range: false,
+		min: 0,
+		max: 60,
+		value: 0,
+		create: function( event, ui ) {
+			document.getElementById("overlap_value").value = "0%";
+		},
+		slide: function( event, ui ) {
+			document.getElementById("overlap_value").value = ui.value.toString() + "%";
+		}/*,
+		stop: function( event, ui ) {
+			update_path();
+		},
+		*/
+    });
+} );
+
+function onClearClick() {
+	map.removeLayer(markerGroup);
+	markerGroup = L.layerGroup().addTo(map);
+	poly_data = [];
+	map.removeLayer(poly_shape);
+	poly_shape = L.polygon([], poly_keys).addTo(map);
+	path_data = [];
+	map.removeLayer(path_shape);
+	path_shape = L.polyline([], path_keys).addTo(map);
+}
+adjusting_altitude = false;
+function onAltitudeClick(){
+	if(!adjusting_altitude){
+		reset_adjust_boxes();
+		disable_adjust_labels();
+		document.getElementById('altitude_btn').style.borderRadius = "5px 0 0 0";
+		document.getElementById('birds_btn').style.borderRadius = "0 0 0 5px";
+		document.getElementById('altitude_box').style.display = "block";
+		
+		document.getElementById('heading_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('overlap_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('camera_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('birds_btn').style.filter = "opacity(0.6) grayscale(1)";
+		
+		adjusting_altitude = true;
+	}
+	else{
+		reset_adjust_boxes()
+	}
+}
+adjusting_heading = false;
+function onHeadingClick(){
+	if(!adjusting_heading){
+		reset_adjust_boxes();
+		disable_adjust_labels();
+		document.getElementById('altitude_btn').style.borderRadius = "5px 0 0 0";
+		document.getElementById('birds_btn').style.borderRadius = "0 0 0 5px";
+		document.getElementById('heading_box').style.display = "block";
+		
+		document.getElementById('altitude_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('overlap_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('camera_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('birds_btn').style.filter = "opacity(0.6) grayscale(1)";
+		
+		adjusting_heading = true;
+	}
+	else{
+		reset_adjust_boxes();
+		
+	}
+}
+adjusting_overlap = false;
+function onOverlapClick(){
+	if(!adjusting_overlap){
+		reset_adjust_boxes();
+		disable_adjust_labels();
+		document.getElementById('altitude_btn').style.borderRadius = "5px 0 0 0";
+		document.getElementById('birds_btn').style.borderRadius = "0 0 0 5px";
+		document.getElementById('overlap_box').style.display = "block";
+		
+		document.getElementById('altitude_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('heading_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('camera_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('birds_btn').style.filter = "opacity(0.6) grayscale(1)";
+		
+		adjusting_overlap = true;
+	}
+	else{
+		reset_adjust_boxes();
+	}
+}
+adjusting_camera = false;
+function onCameraClick(){
+	if(!adjusting_camera){
+		reset_adjust_boxes();
+		disable_adjust_labels();
+		document.getElementById('camera_box').style.display = "block";
+		
+		document.getElementById('altitude_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('heading_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('overlap_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('birds_btn').style.filter = "opacity(0.6) grayscale(1)";
+		
+		adjusting_camera = true;
+	}
+	else{
+		reset_adjust_boxes();
+	}
+}
+adjusting_birds = false;
+function onBirdClick(){
+	if(!adjusting_birds){
+		reset_adjust_boxes();
+		disable_adjust_labels();
+		document.getElementById('altitude_btn').style.borderRadius = "5px 0 0 0";
+		document.getElementById('birds_btn').style.borderRadius = "0 0 0 5px";
+		document.getElementById('bird_box').style.display = "block";
+		
+		document.getElementById('altitude_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('heading_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('overlap_btn').style.filter = "opacity(0.6) grayscale(1)";
+		document.getElementById('camera_btn').style.filter = "opacity(0.6) grayscale(1)";
+		
+		adjusting_birds = true;
+	}
+	else{
+		reset_adjust_boxes();
+	}
+}
+function onExportClick(){
+	alert("export");
+}
+
+function disable_adjust_labels(){
+	var labels = document.getElementsByClassName("adjust_label");
+	for(var i=0; i<labels.length; i++){
+		labels[i].style.visibility = "hidden";
+	}
+}
+function enable_adjust_labels(){
+	var labels = document.getElementsByClassName("adjust_label");
+	for(var i=0; i<labels.length; i++){
+		labels[i].style.visibility = "visible";
+	}
+}
+
+function reset_adjust_boxes(){
+	adjusting_altitude = adjusting_heading = adjusting_overlap = adjusting_camera = adjusting_birds = false;
+	document.getElementById('altitude_btn').style.borderRadius = "5px 5px 0 0";
+	document.getElementById('birds_btn').style.borderRadius = "0 0 5px 5px";
+	document.getElementById('altitude_box').style.display = "none";
+	document.getElementById('heading_box').style.display = "none";
+	document.getElementById('overlap_box').style.display = "none";
+	document.getElementById('camera_box').style.display = "none";
+	document.getElementById('bird_box').style.display = "none";
+	document.getElementById('altitude_btn').style.filter = "opacity(1) grayscale(0)";
+	document.getElementById('heading_btn').style.filter = "opacity(1) grayscale(0)";
+	document.getElementById('overlap_btn').style.filter = "opacity(1) grayscale(0)";
+	document.getElementById('camera_btn').style.filter = "opacity(1) grayscale(0)";
+	document.getElementById('birds_btn').style.filter = "opacity(1) grayscale(0)";
+	enable_adjust_labels();
+}
+
+$(document).keyup(function(e) {
+     if (e.key === "Escape") { // escape key maps to keycode `27`
+        reset_adjust_boxes()
+    }
+});
