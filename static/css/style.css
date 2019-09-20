@@ -234,26 +234,26 @@ controls > li{
 
 #camera_box {
 	width:90px;
-	height: 100px;
+	height: 120px;
 	background-color: white;
 	border-radius: 0 5px 5px 0;
 	position: absolute;
-	top:169px;
+	top:159px;
 	left:44px;
 	display: none;
 }
 
 #camera_box h6 {
-	font-family: 'Josefin Sans', sans-serif;
-	font-weight: bold;
-	font-size: 11px;
+	font-family: Arial, sans-serif;
+	font-size: 14px;
 	margin: 7px 0 1px 0;
+	font-weight: bold;
 }
 #camera_box input {
 	width: 65px;
 	padding: 3px;
 	font-family: 'Arial', sans-serif;
-	font-size: 11px;
+	font-size: 14px;
 }
 
 #bird_box {
@@ -312,4 +312,5 @@ controls > li{
 #bird_list li {
 	font-family: Arial, sans-serif;
 	font-size: 14px;
+	padding: 2px 0 2px 5px;
 }

@@ -28,13 +28,13 @@
 					</div>
 					<div id="camera_box">
 						<h6>Resolution</h6>
-						<input type="text" name="resolution_value" value="640x480">
+						<input type="text" id="resolution_input" name="resolution_value" value="640x480">
 						<h6>View Angle</h6>
-						<input type="text" name="view_angle_value" value="58">
+						<input type="text" id="view_angle_input" name="view_angle_value" value="58">
 					</div>
 					<div id="bird_box">
 						<input type="text" name="bird_input" id="bird_input" placeholder="eg. Wrybill">
-						<input type="text" name="bird_complete" id="bird_complete" readonly>
+						<input type="text" name="bird_complete" id="bird_complete" readonly onclick="add_bird()">
 						<ul id="bird_list"></ul>
 					</div>
 				

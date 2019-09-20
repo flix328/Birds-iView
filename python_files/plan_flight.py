@@ -354,7 +354,7 @@ def split_edge(edge, width):
     points = [L.point_along(dist) for dist in dists]
     return points
 
-def generate_flight_plan(poly, camera, altitude, overlap):
+def generate_flight_plan(poly, camera, altitude, overlap, heading):
     if len(poly) < 3:
         return [], 0
     
@@ -371,7 +371,8 @@ def generate_flight_plan(poly, camera, altitude, overlap):
     
     # get longest edge in polygon, and the line that goes through it
     max_edge = longest_edge(poly)
-    row_r = Line(max_edge)
+    #row_r = Line(max_edge)
+    row_r = Line(cos(heading), -sin(heading),0)
     
     # get the min and max distances from the row_r line, derive the midway value
     min_dist, max_dist = line_range(row_r, poly)

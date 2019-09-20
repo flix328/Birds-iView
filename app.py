@@ -35,7 +35,7 @@ from interface import *
 @app.route('/onMapClick')
 def polygon_add():
 	data = request.args['poly']
-	altitude, poly = format_input_data(data)
+	altitude, heading, overlap, resolution, view_angle, poly = format_input_data(data)
 	
 	lat = float(request.args['lat'])
 	lon = float(request.args['lng'])
@@ -49,7 +49,7 @@ def polygon_add():
 @app.route('/updatePath')
 def get_path():
 	data = request.args['data']
-	altitude, poly = format_input_data(data)
+	altitude, heading, overlap, resolution, view_angle, poly = format_input_data(data)
 	
 	gs = [Objects_GPS.Point(lat, lng) for _, lat, lng in poly.listify()]
 	# convert GPS points to 2D points
@@ -57,10 +57,9 @@ def get_path():
 	p_r = EARTH.project(centre_point(p3Ds))
 	ps = [xyz_to_xy(p_r, p) for p in p3Ds]	
 	
-	overlap = 0
-	camera = {"view angle": 58, "resolution": "640x480"}
+	camera = {"view angle": view_angle, "resolution": resolution}
 	
-	flight_plan, bearing = generate_flight_plan(ps, camera, altitude, overlap)
+	flight_plan, bearing = generate_flight_plan(ps, camera, altitude, overlap, heading)
 	result = ""
 	for p in flight_plan:
 		g = xy_to_gps(p_r, p)

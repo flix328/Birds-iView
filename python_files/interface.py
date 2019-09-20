@@ -12,16 +12,24 @@ def edge_point_dist(S, p):
         return p.dist(p_int)
 
 def format_input_data(data):
+    print("data: ", data)
     poly = Polygon()
     split = data.split(',')
-    print(split)
+    print("split: ", split)
     altitude = float(split[0])
+    heading = float(split[1])
+    overlap = float(split[2]) * 0.01
+    resolution = split[3]
+    view_angle = float(split[4])
+    
+    
+    
     nums = []
-    for value in split[1:]:
+    for value in split[5:]:
         try:
             nums.append(float(value))
         except ValueError:
             continue
     for i in range(0, len(nums), 3):
         poly.push_end(nums[i], Point(nums[i+1], nums[i+2]))
-    return altitude, poly
+    return altitude, heading, overlap, resolution, view_angle, poly
