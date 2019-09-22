@@ -59,12 +59,14 @@ def get_path():
 	
 	camera = {"view angle": view_angle, "resolution": resolution}
 	
-	flight_plan, bearing = generate_flight_plan(ps, camera, altitude, overlap, heading)
+	flight_plan = generate_flight_plan(ps, camera, altitude, overlap, heading)
+	print("flight_plan: ", flight_plan)
 	result = ""
+	print(flight_plan)
 	for p in flight_plan:
+		print("the p:", p)
 		g = xy_to_gps(p_r, p)
 		result += ", " + str(g.lat) + ", " + str(g.lon)
-	result = str(bearing) + result
 	return jsonify(result)
 
 

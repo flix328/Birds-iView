@@ -12,10 +12,8 @@ def edge_point_dist(S, p):
         return p.dist(p_int)
 
 def format_input_data(data):
-    print("data: ", data)
     poly = Polygon()
     split = data.split(',')
-    print("split: ", split)
     altitude = float(split[0])
     heading = float(split[1])
     overlap = float(split[2]) * 0.01

@@ -233,7 +233,6 @@ controls > li{
 }
 
 #camera_box {
-	width:90px;
 	height: 120px;
 	background-color: white;
 	border-radius: 0 5px 5px 0;
@@ -246,14 +245,15 @@ controls > li{
 #camera_box h6 {
 	font-family: Arial, sans-serif;
 	font-size: 14px;
-	margin: 7px 0 1px 0;
+	margin: 7px 7px 1px 7px;
 	font-weight: bold;
 }
 #camera_box input {
-	width: 65px;
+	width: 80px;
 	padding: 3px;
 	font-family: 'Arial', sans-serif;
 	font-size: 14px;
+	margin: 0 7px 0 7px;
 }
 
 #bird_box {

@@ -1,4 +1,4 @@
-var map = L.map('mapid').setView([-43.505835, 172.577879], 10);
+var map = L.map('mapid').setView([-43.6,172.6], 18);
 map.doubleClickZoom.disable(); 
 map.on('click', onMapClick);
 
@@ -13,9 +13,9 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 }).addTo(map);
 
 
-var blueIcon = L.icon({
+var polyIcon = L.icon({
 	
-	iconUrl: "/static/images/marker_icon.png",
+	iconUrl: "/static/images/poly_marker.png",
 	//shadowUrl: 'leaf-shadow.png',
 
 	iconSize:     [15, 15], // size of the icon
@@ -25,8 +25,21 @@ var blueIcon = L.icon({
 	popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
 });
 
-var marker_keys = {icon: blueIcon, draggable: 'true', autoPan: 'true', autoPanPadding: [60, 50]};
-var markerGroup = L.layerGroup().addTo(map);
+var pathIcon = L.icon({
+	
+	iconUrl: "/static/images/path_marker.png",
+	//shadowUrl: 'leaf-shadow.png',
+
+	iconSize:     [10, 10], // size of the icon
+	//shadowSize:   [50, 64], // size of the shadow
+	iconAnchor:   [5, 5], // point of the icon which will correspond to marker's location
+	//shadowAnchor: [4, 62],  // the same for the shadow
+	popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+});
+
+
+var poly_marker_keys = {icon: polyIcon, draggable: 'true', autoPan: 'true', autoPanPadding: [60, 50]};
+var poly_markers = L.layerGroup().addTo(map);
 var poly_keys = {fillColor: '#3d8ea1', fillOpacity: 0.2, color: '#3d8ea1'};
 var poly_shape = L.polygon([], poly_keys).addTo(map);
 
@@ -67,7 +80,8 @@ function onMarkerDragend(e){
 }
 
 function onMapClick(e) {
-	var marker = L.marker(e.latlng, Object.assign({}, marker_keys, {title: e.latlng})).addTo(markerGroup);
+	//var marker = L.marker(e.latlng, Object.assign({}, poly_marker_keys, {title: e.latlng})).addTo(poly_markers);
+	var marker = L.marker(e.latlng, poly_marker_keys).addTo(poly_markers);
 	marker.on('click', onMarkerClick);
 	var out_str = "0, 0, 0, 0, 0, " + poly_data.toString();
 	
@@ -93,8 +107,13 @@ function onMapClick(e) {
 var path_data = [];
 var path_keys = {color: '#FF3B3F', dashArray: "12 6"};
 var path_shape = L.polyline([], path_keys).addTo(map);
+var path_marker_keys = {icon: pathIcon, draggable: 'false'};
+var path_markers = L.layerGroup().addTo(map);
 
 function update_path(){
+	if(poly_data.length < 3){
+		return;
+	}
 	var altitude = parseFloat(document.getElementById("altitude_value").value.slice(0, -1));
 	var heading = parseFloat(document.getElementById("heading_value").value.slice(0, -1));
 	var overlap = parseFloat(document.getElementById("overlap_value").value.slice(0, -1));
@@ -116,6 +135,11 @@ function update_path(){
 		}
 		map.removeLayer(path_shape);
 		path_shape = L.polyline(path, path_keys).addTo(map);
+		map.removeLayer(path_markers);
+		path_markers = L.layerGroup().addTo(map);
+		for(var i=0; i<path.length; i++){
+			var marker = L.marker(path[i], path_marker_keys).addTo(path_markers);
+		}
 		path_data = path;
 	});
 	
@@ -124,13 +148,6 @@ function update_path(){
 var controlID = document.getElementById("controls");
 L.DomEvent.disableClickPropagation(controlID); 
 L.DomEvent.disableScrollPropagation(controlID); 
-
-
-
-
-
-var adjusting_altitude = false;
-
 
 
 
@@ -158,7 +175,7 @@ $( function() {
 		orientation: "vertical",
 		range: false,
 		min: 0,
-		max: 360,
+		max: 180,
 		value: 0,
 		create: function( event, ui ) {
 			document.getElementById("heading_value").value = "0°";
@@ -193,8 +210,10 @@ $( function() {
 } );
 
 function onClearClick() {
-	map.removeLayer(markerGroup);
-	markerGroup = L.layerGroup().addTo(map);
+	map.removeLayer(poly_markers);
+	poly_markers = L.layerGroup().addTo(map);
+	map.removeLayer(path_markers);
+	path_markers = L.layerGroup().addTo(map);
 	poly_data = [];
 	map.removeLayer(poly_shape);
 	poly_shape = L.polygon([], poly_keys).addTo(map);
@@ -202,7 +221,7 @@ function onClearClick() {
 	map.removeLayer(path_shape);
 	path_shape = L.polyline([], path_keys).addTo(map);
 }
-adjusting_altitude = false;
+var adjusting_altitude = false;
 function onAltitudeClick(){
 	if(!adjusting_altitude){
 		reset_adjust_boxes();
@@ -222,7 +241,7 @@ function onAltitudeClick(){
 		reset_adjust_boxes()
 	}
 }
-adjusting_heading = false;
+var adjusting_heading = false;
 function onHeadingClick(){
 	if(!adjusting_heading){
 		reset_adjust_boxes();
@@ -243,7 +262,7 @@ function onHeadingClick(){
 		
 	}
 }
-adjusting_overlap = false;
+var adjusting_overlap = false;
 function onOverlapClick(){
 	if(!adjusting_overlap){
 		reset_adjust_boxes();
@@ -263,7 +282,7 @@ function onOverlapClick(){
 		reset_adjust_boxes();
 	}
 }
-adjusting_camera = false;
+var adjusting_camera = false;
 function onCameraClick(){
 	if(!adjusting_camera){
 		reset_adjust_boxes();
@@ -282,7 +301,7 @@ function onCameraClick(){
 		reset_adjust_boxes();
 	}
 }
-adjusting_birds = false;
+var adjusting_birds = false;
 function onBirdClick(){
 	if(!adjusting_birds){
 		reset_adjust_boxes();
@@ -520,9 +539,9 @@ function onExportClick(){
 		
 		row = lat.toString() + "," + lon.toString() + "," + altitude.toString() + "," + heading.toString() + ",0,0,0,0,";
 		if(i==0){
-			row = row + "5,-90,"
+			row += "5,-90,"
 		}
-		row = row + "0,1500,1,0,0,1500,"
+		row += "0,1000,1,0,0,1000,"
 		csv += row + "\n";
 	}
 
