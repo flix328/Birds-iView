@@ -283,6 +283,19 @@ def merge_ranges(ranges):
                 # check next pair of ranges
                 r_num += 1
 
+def split_range(r, dist, overlap):
+    '''splits a range (min_dist, max_dist) into overlapping ranges of length dist'''
+    min_dist, max_dist = r
+    mid_dist = 0.5 * (min_dist + max_dist)
+    result_min_dist, result_max_dist = min_dist + (0.5 - overlap) * dist, max_dist - (0.5 - overlap) * dist
+    if result_min_dist >= result_max_dist:
+        result = [mid_dist]
+    else:
+        num_gaps = ceil((result_max_dist - result_min_dist) / (1 - overlap) / dist)
+        gap_size = (result_max_dist - result_min_dist) / num_gaps
+        result = [result_min_dist + i * gap_size for i in range(num_gaps + 1)]
+    return result
+
 def split_row(poly, row, G_w, G_h, overlap):
     '''returns a range of distance values that cover the entire area'''
     # get part of poly inside drone's field of view
@@ -310,12 +323,7 @@ def split_row(poly, row, G_w, G_h, overlap):
             sub_poly = create_sub_poly(bound_range, truncated_num, truncated_poly)
             # get its min and max distance along the boundary and record it
             min_dist, max_dist = line_range(row, sub_poly, direction="parallel")
-            min_dist += 0.5 * G_h
-            max_dist -= 0.5 * G_h
-            if max_dist > min_dist:
-                dist_ranges.append((min_dist, max_dist))
-            else:
-                dist_ranges.append((0.5 * (min_dist + max_dist), None))
+            dist_ranges.append((min_dist, max_dist))
         # join any two ranges that intersect
         merge_ranges(dist_ranges)
     return dist_ranges
@@ -331,42 +339,6 @@ def flight_path_dist(ps):
         # add it to the running total 
         total_dist += dist
     return total_dist
-
-def split_edge(edge, width):
-    ''' splits edge into a minimal number segments of maximum length width '''
-    p0, p1 = edge
-    
-    # get the line that passes through the edge
-    S = LineSegment(p0, p1)
-    L = Line(S)
-    
-    # get the min and max distance along the line of the endpoints
-    dist_bounds = L.distance_along(p0), L.distance_along(p1)
-    min_dist, max_dist = min(*dist_bounds), max(*dist_bounds)
-    
-    # get the distance halfway between the endpoints
-    mid_dist = (min_dist + max_dist) / 2
-    
-    # Initialise the incremental distance variable
-    dist = mid_dist + width / 2
-    
-    # set up a list to record each distance along the line
-    dists = [min_dist, max_dist]
-    
-    # while the largest endpoint hasn't been reached
-    while dist < max_dist:
-        # add the two distance values along the line on either side of mid_dist
-        dists.append(dist)
-        dists.append(2 * mid_dist - dist)
-        
-        # Increment dist by the maximum segment length
-        dist += width
-    # sort the distance values
-    dists.sort()
-    
-    # get the point at each distance value along the line
-    points = [L.point_along(dist) for dist in dists]
-    return points
 
 def generate_flight_plan(poly, camera, altitude, overlap, heading):
     if len(poly) < 3:
@@ -387,21 +359,9 @@ def generate_flight_plan(poly, camera, altitude, overlap, heading):
     
     # get the min and max distances from the row_r line, derive the midway value
     min_dist, max_dist = line_range(row_r, poly)
-    mid_dist = (min_dist + max_dist) / 2
     
-    # get list of parallel lines that will cover the polygon
-    rows = [row_r.offset(mid_dist)]
-    row_dist = mid_dist + G_w * (1 - overlap)
-    # while the maximum distance from the row_r line has not been exceeded
-    while row_dist - G_w / 2 < max_dist:
-        # add the parallel lines to row_r on either side of it to rows
-        rows.append(row_r.offset(row_dist))
-        rows.append(row_r.offset(2 * mid_dist - row_dist))
-        # increment the distance from row_r
-        row_dist += G_w * (1 - overlap)
-    
-    # sort the rows by distance from the origin
-    rows.sort(key=lambda row: row.c)
+    row_dists = split_range((min_dist, max_dist), G_w, overlap)
+    rows = [row_r.offset(dist) for dist in row_dists]
     
     edges = []
     # Iterate through the parallel lines
@@ -409,46 +369,26 @@ def generate_flight_plan(poly, camera, altitude, overlap, heading):
         # split the row into ranges of distances along the boundaries
         row_sections = split_row(poly, row, G_w, G_h, overlap)
         
+        edge_points = []
         # ignore sub_ranges for simplicity, take overall range from whole row
-        min_dist, max_dist = row_sections[0][0], row_sections[-1][1]
-        p_min = row.point_along(min_dist)
-        if not max_dist:
-            p_max = None
-        else:
-            p_max = row.point_along(max_dist)
-        
-        edges.append((p_min, p_max))
-    print("edges:",edges)
+        for row_section in row_sections:
+            split = split_range(row_section, G_h, overlap)
+            edge_points += [row.point_along(dist) for dist in split]
+        edge_points.sort(key = lambda p: row.distance_along(p))
+        edges.append(edge_points)
     
     # Try zig-zagging in both directions and take the shortest option
-    flight_path0 = []
-    for edge_num, edge in enumerate(edges):
-        if not edge[1]:
-            flight_path0 += [edge[0]]
-        else:
-            # split the edge so that it can be fully covered by images
-            edge_points = split_edge(edge, G_h * (1 - overlap))
-            # Option 1: Even-numbered edges go in normal order, else reversed
-            if edge_num % 2 == 0 and edge_points[0] == edge[1]:
-                edge_points.reverse()
-            elif edge_num % 2 == 1 and edge_points[0] == edge[0]:
-                edge_points.reverse()
+    flight_path0, flight_path1 = [], []
+    for edge_num, edge_points in enumerate(edges):
+        # Option 1: Even-numbered edges go in normal order, else reversed
+        if edge_num % 2 == 0:
             flight_path0 += edge_points
-    flight_path1 = []
-    for edge_num, edge in enumerate(edges):
-        if not edge[1]:
-            flight_path1 += [edge[0]]
-        else:
-            # split the edge so that it can be fully covered by images
-            print(edge)
-            edge_points = split_edge(edge, G_h * (1 - overlap))
-            # Option 2: Odd-numbered edges go in normal order, else reversed
-            if edge_num % 2 == 1 and edge_points[0] == edge[1]:
-                edge_points.reverse()
-            elif edge_num % 2 == 0 and edge_points[0] == edge[0]:
-                edge_points.reverse()
+            edge_points.reverse()
             flight_path1 += edge_points
-    # use whichever option is shorter
+        else:
+            flight_path1 += edge_points
+            edge_points.reverse()
+            flight_path0 += edge_points
     if flight_path_dist(flight_path0) < flight_path_dist(flight_path1):
         flight_path = flight_path0
     else:

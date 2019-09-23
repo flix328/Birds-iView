@@ -112,6 +112,10 @@ var path_markers = L.layerGroup().addTo(map);
 
 function update_path(){
 	if(poly_data.length < 3){
+		map.removeLayer(path_shape);
+		path_shape = L.polyline().addTo(map);
+		map.removeLayer(path_markers);
+		path_markers = L.layerGroup().addTo(map);
 		return;
 	}
 	var altitude = parseFloat(document.getElementById("altitude_value").value.slice(0, -1));
