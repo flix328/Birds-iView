@@ -1,10 +1,10 @@
-var map = L.map('mapid').setView([-43.6,172.6], 18);
+var map = L.map('mapid').setView([-43.3821681,172.6596595], 15);
 map.doubleClickZoom.disable(); 
 map.on('click', onMapClick);
 
 var poly_data = [];
 
-L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+var map_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 	maxZoom: 20, /* changed from original 18*/
 	attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
 		'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -16,24 +16,18 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 var polyIcon = L.icon({
 	
 	iconUrl: "/static/images/poly_marker.png",
-	//shadowUrl: 'leaf-shadow.png',
 
 	iconSize:     [15, 15], // size of the icon
-	//shadowSize:   [50, 64], // size of the shadow
 	iconAnchor:   [7.5, 7.5], // point of the icon which will correspond to marker's location
-	//shadowAnchor: [4, 62],  // the same for the shadow
 	popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
 });
 
 var pathIcon = L.icon({
 	
 	iconUrl: "/static/images/path_marker.png",
-	//shadowUrl: 'leaf-shadow.png',
 
-	iconSize:     [10, 10], // size of the icon
-	//shadowSize:   [50, 64], // size of the shadow
-	iconAnchor:   [5, 5], // point of the icon which will correspond to marker's location
-	//shadowAnchor: [4, 62],  // the same for the shadow
+	iconSize:     [8, 8], // size of the icon
+	iconAnchor:   [4, 4], // point of the icon which will correspond to marker's location
 	popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
 });
 
@@ -112,10 +106,10 @@ var path_markers = L.layerGroup().addTo(map);
 
 function update_path(){
 	if(poly_data.length < 3){
-		map.removeLayer(path_shape);
-		path_shape = L.polyline().addTo(map);
 		map.removeLayer(path_markers);
 		path_markers = L.layerGroup().addTo(map);
+		map.removeLayer(path_shape);
+		path_shape = L.polyline([], path_keys).addTo(map);
 		return;
 	}
 	var altitude = parseFloat(document.getElementById("altitude_value").value.slice(0, -1));
@@ -149,11 +143,47 @@ function update_path(){
 	
 }
 
+is_satellite = true;
+function onMapTypeClick(){
+	if(is_satellite){
+		map.removeLayer(map_layer);
+		map_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+			maxZoom: 20, /* changed from original 18*/
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+				'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			id: 'mapbox.streets'
+		}).addTo(map);
+
+
+		$("#map_type a").text('Satellite');
+		document.getElementById("map_type_a").style.backgroundImage = "url('/static/images/mapbox_satellite.png')";
+	}
+	else{
+		map.removeLayer(map_layer);
+		map_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+			maxZoom: 20, /* changed from original 18*/
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+				'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			id: 'mapbox.satellite'
+		}).addTo(map);
+		$("#map_type a").text('Streets');
+		document.getElementById("map_type_a").style.backgroundImage = "url('/static/images/mapbox_streets.png')";
+	}
+	is_satellite = !is_satellite;
+}
+
+
 var controlID = document.getElementById("controls");
 L.DomEvent.disableClickPropagation(controlID); 
-L.DomEvent.disableScrollPropagation(controlID); 
-
-
+L.DomEvent.disableScrollPropagation(controlID);
+var map_typeID = document.getElementById("map_type");
+L.DomEvent.disableClickPropagation(map_typeID); 
+L.DomEvent.disableScrollPropagation(map_typeID);
+var summary_boxID = document.getElementById("summary_box");
+L.DomEvent.disableClickPropagation(summary_boxID); 
+L.DomEvent.disableScrollPropagation(summary_boxID);
 
 $( function() {
 	$( "#altitude_slider" ).slider({
@@ -468,7 +498,7 @@ function extract_resolution(str){
 	}	
 }
 
-var resolution = [640, 480];
+var resolution = [4000, 3000];
 function on_resolution_value_change(){
 	res = extract_resolution(document.getElementById("resolution_input").value);
 	if(res){
@@ -480,10 +510,39 @@ function on_resolution_value_change(){
 	on_update();
 }
 
+var view_angle = 94;
+function on_view_angle_value_change(){
+	str = document.getElementById("view_angle_input").value;
+	if(isNaN(str) || parseFloat(str) <= 0 || parseFloat(str) >= 180){
+		document.getElementById("view_angle_input").value = view_angle.toString();
+	}
+	else{
+		view_angle = parseFloat(str); 
+	}
+	on_update();
+}
+
+$("#resolution_input").focusout(function(){
+	on_resolution_value_change();
+	on_update();
+});
+$("#view_angle_input").focusout(function(){
+	on_view_angle_value_change();
+	on_update();
+});
+
 document.getElementById("resolution_input").onblur=on_resolution_value_change;
 $("#resolution_input").on('keyup', function (e) {
     if (e.keyCode === 13) {
         on_resolution_value_change();
+        on_update();
+    }
+});
+document.getElementById("view_angle_input").onblur=on_resolution_value_change;
+$("#view_angle_input").on('keyup', function (e) {
+    if (e.keyCode === 13) {
+		on_view_angle_value_change();
+        on_update();
     }
 });
 
@@ -495,7 +554,7 @@ function check_birds(){
 	var res_h = res[1];
 	G = 2 * h * Math.tan(a / 2) / Math.sqrt(Math.pow(res_w, 2) + Math.pow(res_h, 2)) * 100
 	
-	
+	console.log("G: ", G);
 	for(var i=0; i<birds_used.length; i++){
 		size = bird_size[birds_used[i]];
 		if(G < 0.5 * size){

@@ -3,6 +3,7 @@
 {% block content %}
 
 		<div id="mapid">
+			<div id="map_type"><a id="map_type_a" onclick='onMapTypeClick()'>Streets</a></div>
 			<ul id="controls">
 				<li id="delete_group"><ul>
 					<li id="delete_btn" style='background-image: url("static/images/ic_delete.png")'><a onclick='onClearClick()'><span>Clear</span></a></li>
@@ -28,9 +29,9 @@
 					</div>
 					<div id="camera_box">
 						<h6>Resolution</h6>
-						<input type="text" id="resolution_input" name="resolution_value" value="640x480">
+						<input type="text" id="resolution_input" name="resolution_value" value="4000x3000" spellcheck="false">
 						<h6>View Angle</h6>
-						<input type="text" id="view_angle_input" name="view_angle_value" value="58">
+						<input type="text" id="view_angle_input" name="view_angle_value" value="94" spellcheck="false">
 					</div>
 					<div id="bird_box">
 						<input type="text" name="bird_input" id="bird_input" placeholder="eg. Wrybill">
@@ -44,6 +45,11 @@
 				</ul></li>
 				
 			</ul>
+			<div id="summary_box">
+				<p id="stat_area">Survey Area: 0.4km²</p>
+				<p id="stat_area">Flight Distance: 0.5km</p>
+				<p id="stat_area">Number of Photos: 12</p>
+			</div>
 		</div>
 		<script src="static/js/script.js"></script>
 

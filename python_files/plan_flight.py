@@ -343,6 +343,8 @@ def flight_path_dist(ps):
 def generate_flight_plan(poly, camera, altitude, overlap, heading):
     if len(poly) < 3:
         return [], 0
+    if overlap == 0:
+        overlap = 0.0001
     
     # unpack values
     R_w, R_h = camera["resolution"].split('x')
