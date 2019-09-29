@@ -1,4 +1,4 @@
-var map = L.map('mapid').setView([-43.3821681,172.6596595], 15);
+var map = L.map('mapid').setView([-43.5,172.6], 10);
 map.doubleClickZoom.disable(); 
 map.on('click', onMapClick);
 
@@ -12,6 +12,36 @@ var map_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.pn
 	id: 'mapbox.satellite'
 }).addTo(map);
 
+is_satellite = true;
+function onMapTypeClick(){
+	if(is_satellite){
+		map.removeLayer(map_layer);
+		map_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+			maxZoom: 20, /* changed from original 18*/
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+				'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			id: 'mapbox.streets'
+		}).addTo(map);
+
+
+		$("#map_type a").text('Satellite');
+		document.getElementById("map_type_a").style.backgroundImage = "url('/static/images/mapbox_satellite.png')";
+	}
+	else{
+		map.removeLayer(map_layer);
+		map_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+			maxZoom: 20, /* changed from original 18*/
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+				'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			id: 'mapbox.satellite'
+		}).addTo(map);
+		$("#map_type a").text('Streets');
+		document.getElementById("map_type_a").style.backgroundImage = "url('/static/images/mapbox_streets.png')";
+	}
+	is_satellite = !is_satellite;
+}
 
 var polyIcon = L.icon({
 	
@@ -110,6 +140,10 @@ function update_path(){
 		path_markers = L.layerGroup().addTo(map);
 		map.removeLayer(path_shape);
 		path_shape = L.polyline([], path_keys).addTo(map);
+		
+		$("#stat_area").text('Survey Area: None');
+		$("#stat_dist").text('Flight Distance: None');
+		$("#stat_num_photos").text('Number of Photos: None');
 		return;
 	}
 	var altitude = parseFloat(document.getElementById("altitude_value").value.slice(0, -1));
@@ -124,9 +158,17 @@ function update_path(){
 	
 	$.getJSON('/updatePath',{data: out_str}, function(data) {
 		data = data.toString().split(",");
-		bearing = parseFloat(data[0]);
-		path = [];
-		for(var i = 1; i < data.length; i=i+2){
+		var poly_area = parseFloat(data[0]).toPrecision(2) / 1000000;
+		var dist = parseFloat(data[1]).toPrecision(2) / 1000;
+		var num_photos = parseInt(data[2]);
+		
+		
+		$("#stat_area").text('Survey Area: ' + poly_area.toString() + "km²");
+		$("#stat_dist").text('Flight Distance: ' + dist.toString() + "km");
+		$("#stat_num_photos").text('Number of Photos: ' + num_photos.toString());
+		
+		var path = [];
+		for(var i = 3; i < data.length; i=i+2){
 			lat = parseFloat(data[i]);
 			lng = parseFloat(data[i+1]);
 			path.push([lat, lng]);
@@ -141,37 +183,7 @@ function update_path(){
 		path_data = path;
 	});
 	
-}
-
-is_satellite = true;
-function onMapTypeClick(){
-	if(is_satellite){
-		map.removeLayer(map_layer);
-		map_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-			maxZoom: 20, /* changed from original 18*/
-			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-				'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-				'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-			id: 'mapbox.streets'
-		}).addTo(map);
-
-
-		$("#map_type a").text('Satellite');
-		document.getElementById("map_type_a").style.backgroundImage = "url('/static/images/mapbox_satellite.png')";
-	}
-	else{
-		map.removeLayer(map_layer);
-		map_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-			maxZoom: 20, /* changed from original 18*/
-			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-				'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-				'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-			id: 'mapbox.satellite'
-		}).addTo(map);
-		$("#map_type a").text('Streets');
-		document.getElementById("map_type_a").style.backgroundImage = "url('/static/images/mapbox_streets.png')";
-	}
-	is_satellite = !is_satellite;
+	
 }
 
 
@@ -254,6 +266,7 @@ function onClearClick() {
 	path_data = [];
 	map.removeLayer(path_shape);
 	path_shape = L.polyline([], path_keys).addTo(map);
+	update_path();
 }
 var adjusting_altitude = false;
 function onAltitudeClick(){
@@ -498,7 +511,7 @@ function extract_resolution(str){
 	}	
 }
 
-var resolution = [4000, 3000];
+var resolution = [960, 640];
 function on_resolution_value_change(){
 	res = extract_resolution(document.getElementById("resolution_input").value);
 	if(res){
@@ -510,7 +523,7 @@ function on_resolution_value_change(){
 	on_update();
 }
 
-var view_angle = 94;
+var view_angle = 104.4;
 function on_view_angle_value_change(){
 	str = document.getElementById("view_angle_input").value;
 	if(isNaN(str) || parseFloat(str) <= 0 || parseFloat(str) >= 180){
@@ -552,9 +565,10 @@ function check_birds(){
 	var res = extract_resolution(document.getElementById("resolution_input").value);
 	var res_w = res[0];
 	var res_h = res[1];
-	G = 2 * h * Math.tan(a / 2) / Math.sqrt(Math.pow(res_w, 2) + Math.pow(res_h, 2)) * 100
+	console.log(h, a, res_w, res_h);
+	G = 2 * h * Math.tan(a / 2  * Math.PI/180) / Math.sqrt(Math.pow(res_w, 2) + Math.pow(res_h, 2)) * 100
+	console.log(G);
 	
-	console.log("G: ", G);
 	for(var i=0; i<birds_used.length; i++){
 		size = bird_size[birds_used[i]];
 		if(G < 0.5 * size){
@@ -581,7 +595,6 @@ function download_csv() {
             csv += "\n";
     });
  
-    console.log(csv);
     var hiddenElement = document.createElement('a');
     hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
     hiddenElement.target = '_blank';

@@ -13,11 +13,15 @@ app = Flask(__name__)
 def index():
 	return render_template('home.html', title="My Application")
 
-# This is the function shows the Athletes page
+# This is the function shows the plan page
 @app.route('/plan', methods=["GET","POST"])
 def plan():
 	return render_template('plan.html', title="Planning")
 
+# This is the function shows the analyse page
+@app.route('/analyse', methods=["GET","POST"])
+def analyse():
+	return render_template('analyse.html', title="Analysis")
 
 
 # Add the "python_files" directory to sys.path to import other modules
@@ -45,7 +49,7 @@ def polygon_add():
 	poly.push(_id, p)
 	return jsonify(poly.listify())
 
-# map click function happening without any refreshing
+# get new flight path
 @app.route('/updatePath')
 def get_path():
 	data = request.args['data']
@@ -60,7 +64,20 @@ def get_path():
 	camera = {"view angle": view_angle, "resolution": resolution}
 	
 	flight_plan = generate_flight_plan(ps, camera, altitude, overlap, heading)
-	result = ""
+	
+	poly_2D = [xyz_to_xy(p_r, gps_to_xyz(Objects_GPS.Point(lat, lon))) for _, lat, lon in poly.listify()]
+	
+	total = 0
+	for p1_num, p1 in enumerate(poly_2D):
+		p0 = poly_2D[p1_num - 1]
+		total += p0.x * p1.y - p1.x * p0.y
+	area = 0.5 * abs(total)
+	
+	
+	dist = flight_path_dist(flight_plan)
+	num_photos = len(flight_plan)
+	
+	result = "{}, {}, {}".format(area, dist, num_photos)
 	for p in flight_plan:
 		g = xy_to_gps(p_r, p)
 		result += ", " + str(g.lat) + ", " + str(g.lon)

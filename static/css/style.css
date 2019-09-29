@@ -71,7 +71,7 @@ main {
 	position: absolute;
 	background-color: rgba(0,0,0,0.2);
 	top: 10px;
-	left: 50px;
+	left: 54px;
 	z-index: 401;
 	margin: 0;
 	padding: 2px;
@@ -274,6 +274,7 @@ main {
 	font-size: 14px;
 	margin: 7px 7px 1px 7px;
 	font-weight: bold;
+	white-space: nowrap;
 }
 #camera_box input {
 	width: 80px;
@@ -353,7 +354,7 @@ main {
 	padding: 5px 8px;
 	text-align: left;
 	border-radius: 5px;
-	width: 165px;
+	width: 155px;
 }
 
 #summary_box p {

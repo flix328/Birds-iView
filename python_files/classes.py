@@ -18,7 +18,7 @@ def edge_point_dist(S, p):
         return p.dist(p_int)
 
 class Polygon():
-    def __init__(poly):
+    def __init__(poly, ps=None):
         ''' Initialise an empty polygon '''
         poly.head = None
         poly.length = 0
@@ -124,16 +124,6 @@ class Polygon():
         else:
             poly.push_end(_id, p)
         return poly
-    def area(poly):
-        if poly.head:
-            total = poly.head.data.x * poly.head.prev.data.y - poly.head.prev.data.x * poly.head.data.y
-            node = poly.head.next
-            while node != poly.head:
-                total += node.data.x * node.prev.data.y - node.prev.data.x * node.data.y
-                node = node.next
-        else:
-            total = 0
-        return 0.5 * abs(total)
 
 
 def main():
