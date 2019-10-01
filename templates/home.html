@@ -3,10 +3,30 @@
 		<script>
 			document.getElementById("a_Home").style.color = "#833103";
 		</script>
-		
-		
-		<p>Birds iView is a better way to monitor bird populations over time, by making use of drone-based hyperspectral imaging. 
-		Learn more about the project <a href="https://docs.google.com/document/d/1992Am7ezn-kY6opUjQ1dioIjrTzJKkj07MqW8lY8-XQ/edit?usp=sharing">here</a>.</p>
-
-
+		<p id="top_text"><span style="font-weight: bold; color: #ff3b3f">Birds</span> <span style="font-weight: bold; color: #833103">iView</span> is a better way to undertake bird counts for long-term bird monitoring. <br>
+			The idea is to fly drones over bird populations and take aerial images. <br>
+			These images can then be sifted through later to count what birds there are.</p>
+		<div id="sky_box">
+			<img id="drone_photo_img" src="static/images/takingdronephotos.png">
+		</div>
+		<div id="help_box">
+			<h2>How to Plan a Bird Count</h2>
+			<div id="grid_box">
+				<p style="grid-row-start: 1;">Find where you want to do your bird count. It might be easier to find the general location in the Streets mode and then switch to Satellite mode to select the survey area precisely.</p>
+				<img style="grid-row-start: 1;" src="static/images/gif1_locate.gif">
+				<p style="grid-row-start: 2;">Select the area you want to survey. Click on the map to create a boundary points, drag them around and click on them to remove them. You can also click the "Clear" button to remove everything from the map.<br><i>Note: Each new boundary point will be inserted into the closest edge of the polygon.</i></p>
+				<img style="grid-row-start: 2;" src="static/images/gif2_select.gif">
+				<p style="grid-row-start: 3;">Adjust the drone altitude. Flying low means good quality images but causes long flight paths and possible disturbance to the birds below. Flying high means short flight paths but worse image quality.</p>
+				<img style="grid-row-start: 3;" src="static/images/gif3_altitude.gif">
+				<p style="grid-row-start: 4;">Adjust the heading. Flying parallel or perpendicular to the long axis of the survey area usually produces good short flight paths.</p>
+				<img style="grid-row-start: 4;" src="static/images/gif4_heading.gif">
+				<p style="grid-row-start: 5;">Adjust the overlap between images. Large overlap reduces the changes of missing details between images, but also makes longer flight paths.</p>
+				<img style="grid-row-start: 5;" src="static/images/gif5_overlap.gif">
+				<p style="grid-row-start: 6;">Enter the settings of the drone camera. Larger view angle makes shorter flight paths but worsens image quality, and higher resolution improves image quality.</p>
+				<img style="grid-row-start: 6;" src="static/images/gif6_camera.gif">
+				<p style="grid-row-start: 7;">Enter the bird species that you're expecting to find in the survey, and check that they all appear green. If they are orange or red, you will need to improve your image quality in order to be able to detect them in the result images, by flying lower or by using a better camera.</p>
+				<img style="grid-row-start: 7;" src="static/images/gif7_birds.gif">
+			</div>
+		</div>
+		<script src="static/js/home_script.js"></script>
 {% endblock %}
