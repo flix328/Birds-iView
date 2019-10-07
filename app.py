@@ -49,7 +49,7 @@ def polygon_add():
 	poly.push(_id, p)
 	return jsonify(poly.listify())
 
-MAX_POINTS = 99	
+MAX_POINTS = 120	
 # get new flight path
 @app.route('/updatePath')
 def get_path():

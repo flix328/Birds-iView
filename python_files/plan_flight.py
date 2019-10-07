@@ -337,38 +337,47 @@ def split_row(poly, row, G_w, G_h, overlap):
         merge_ranges(dist_ranges)
     return dist_ranges
 
-def best_zig_zag_direction(edges):
-    # Try zig-zagging in both directions and take the shortest option
-    flight_path0, flight_path1 = [], []
-    for edge_num, edge_points in enumerate(edges):
-        # Option 1: Even-numbered edges go in normal order, else reversed
-        if edge_num % 2 == 0:
-            flight_path0 += edge_points
-            edge_points.reverse()
-            flight_path1 += edge_points
-        else:
-            flight_path1 += edge_points
-            edge_points.reverse()
-            flight_path0 += edge_points
-    if flight_path_dist(flight_path0) < flight_path_dist(flight_path1):
-        flight_path = flight_path0
-    else:
-        flight_path = flight_path1
-    return flight_path        
-
 def optimal_route(edges):
+    ''' returns the route that zig-zags up and down the edges in the least distance. '''
+    if len(edges) == 1:
+        return edges[0]
+    ends = [(edges[i][0], edges[i][-1]) for i in range(len(edges)) if len(edges[i]) > 0]
+    paths = [[[["",0],["",0]],[["",0],["",0]]],
+             [[["00",ends[0][1].dist(ends[1][0])],
+               ["01",ends[0][1].dist(ends[1][1])]],
+              [["10",ends[0][0].dist(ends[1][0])],
+               ["11",ends[0][0].dist(ends[1][1])]]]]
+    i = 2
+    while i < len(ends):
+        for j in range(2):
+            for k in range(2):
+                # optimise j - > k path
+                if(paths[(i-1)%2][j][0][1] + ends[i-1][1].dist(ends[i][k]) < 
+                   paths[(i-1)%2][j][1][1] + ends[i-1][0].dist(ends[i][k])): 
+                    paths[i%2][j][k][1] = paths[(i-1)%2][j][0][1] + ends[i-1][1].dist(ends[i][k])
+                    paths[i%2][j][k][0] = paths[(i-1)%2][j][0][0] + str(k)
+                else:
+                    paths[i%2][j][k][1] = paths[(i-1)%2][j][1][1] + ends[i-1][0].dist(ends[i][k])
+                    paths[i%2][j][k][0] = paths[(i-1)%2][j][1][0] + str(k)               
+        
+        i += 1
+    
+    end = (len(ends)-1)%2
+    
+    best_path = paths[end][0][0][0]
+    best_dist = paths[end][0][0][1]
+    for i in range(2):
+        for j in range(2):
+            if paths[end][i][j][1] < best_dist:
+                best_dist = paths[end][i][j][1]
+                best_path = paths[end][i][j][0]
+    
     flight_path = []
-    edge_num0 = 0
-    while edge_num0 < len(edges):
-        if len(edges[edge_num0]) == 1:
-            flight_path += edges[edge_num0]
-            edge_num0 += 1            
-        else:
-            edge_num1 = edge_num0 + 1
-            while edge_num1 < len(edges) and len(edges[edge_num1]) > 1:
-                edge_num1 += 1
-            flight_path += best_zig_zag_direction(edges[edge_num0 : edge_num1])
-            edge_num0 = edge_num1
+    for edge_num, char in enumerate(best_path):
+        edge = edges[edge_num]
+        if char == "1":
+            edge.reverse()
+        flight_path += edge
     return flight_path
 
 def flight_path_dist(ps):
