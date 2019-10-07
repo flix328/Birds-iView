@@ -158,14 +158,14 @@ function update_path(){
 	
 	$.getJSON('/updatePath',{data: out_str}, function(data) {
 		data = data.toString().split(",");
-		var poly_area = parseFloat(data[0]).toPrecision(2) / 1000000;
-		var dist = parseFloat(data[1]).toPrecision(2) / 1000;
-		var num_photos = parseInt(data[2]);
+		var poly_area_str = (parseFloat(data[0]).toPrecision(2) / 1000000).toString() + "km²";
+		var dist_str = (parseFloat(data[1]).toPrecision(2) / 1000).toString() + "km";
+		var num_photos_str = data[2].toString();
 		
 		
-		$("#stat_area").text('Survey Area: ' + poly_area.toString() + "km²");
-		$("#stat_dist").text('Flight Distance: ' + dist.toString() + "km");
-		$("#stat_num_photos").text('Number of Photos: ' + num_photos.toString());
+		$("#stat_area").text('Survey Area: ' + poly_area_str);
+		$("#stat_dist").text('Flight Distance: ' + dist_str);
+		$("#stat_num_photos").text('Number of Photos: ' + num_photos_str);
 		
 		var path = [];
 		for(var i = 3; i < data.length; i=i+2){
@@ -565,9 +565,7 @@ function check_birds(){
 	var res = extract_resolution(document.getElementById("resolution_input").value);
 	var res_w = res[0];
 	var res_h = res[1];
-	console.log(h, a, res_w, res_h);
 	G = 2 * h * Math.tan(a / 2  * Math.PI/180) / Math.sqrt(Math.pow(res_w, 2) + Math.pow(res_h, 2)) * 100
-	console.log(G);
 	
 	for(var i=0; i<birds_used.length; i++){
 		size = bird_size[birds_used[i]];
@@ -617,7 +615,7 @@ function onExportClick(){
 		if(i==0){
 			row += "5,-90,"
 		}
-		row += "0,1000,1,0,0,1000,"
+		row += "1,0,"
 		csv += row + "\n";
 	}
 

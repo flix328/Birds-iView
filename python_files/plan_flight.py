@@ -283,17 +283,26 @@ def merge_ranges(ranges):
                 # check next pair of ranges
                 r_num += 1
 
-def split_range(r, dist, overlap):
+def split_range(r, dist, overlap, max_points=None):
     '''splits a range (min_dist, max_dist) into overlapping ranges of length dist'''
     min_dist, max_dist = r
     mid_dist = 0.5 * (min_dist + max_dist)
-    result_min_dist, result_max_dist = min_dist + (0.5 - overlap) * dist, max_dist - (0.5 - overlap) * dist
+    result_min_dist = min_dist + (0.5 - overlap) * dist
+    result_max_dist = max_dist - (0.5 - overlap) * dist
+    
     if result_min_dist >= result_max_dist:
-        result = [mid_dist]
+        if max_points is None or max_points > 0:
+            result = [mid_dist]
+        else:
+            result = []
     else:
         num_gaps = ceil((result_max_dist - result_min_dist) / (1 - overlap) / dist)
-        gap_size = (result_max_dist - result_min_dist) / num_gaps
-        result = [result_min_dist + i * gap_size for i in range(num_gaps + 1)]
+        gap_size = (result_max_dist - result_min_dist) / (num_gaps)
+        if max_points is not None:
+            num_points = min(max_points, num_gaps + 1)
+        else:
+            num_points = num_gaps + 1
+        result = [result_min_dist + i * gap_size for i in range(num_points)]
     return result
 
 def split_row(poly, row, G_w, G_h, overlap):
@@ -328,6 +337,40 @@ def split_row(poly, row, G_w, G_h, overlap):
         merge_ranges(dist_ranges)
     return dist_ranges
 
+def best_zig_zag_direction(edges):
+    # Try zig-zagging in both directions and take the shortest option
+    flight_path0, flight_path1 = [], []
+    for edge_num, edge_points in enumerate(edges):
+        # Option 1: Even-numbered edges go in normal order, else reversed
+        if edge_num % 2 == 0:
+            flight_path0 += edge_points
+            edge_points.reverse()
+            flight_path1 += edge_points
+        else:
+            flight_path1 += edge_points
+            edge_points.reverse()
+            flight_path0 += edge_points
+    if flight_path_dist(flight_path0) < flight_path_dist(flight_path1):
+        flight_path = flight_path0
+    else:
+        flight_path = flight_path1
+    return flight_path        
+
+def optimal_route(edges):
+    flight_path = []
+    edge_num0 = 0
+    while edge_num0 < len(edges):
+        if len(edges[edge_num0]) == 1:
+            flight_path += edges[edge_num0]
+            edge_num0 += 1            
+        else:
+            edge_num1 = edge_num0 + 1
+            while edge_num1 < len(edges) and len(edges[edge_num1]) > 1:
+                edge_num1 += 1
+            flight_path += best_zig_zag_direction(edges[edge_num0 : edge_num1])
+            edge_num0 = edge_num1
+    return flight_path
+
 def flight_path_dist(ps):
     ''' Returns the distance a flight path covers'''
     total_dist = 0
@@ -340,7 +383,7 @@ def flight_path_dist(ps):
         total_dist += dist
     return total_dist
 
-def generate_flight_plan(poly, camera, altitude, overlap, heading):
+def generate_flight_plan(poly, camera, altitude, overlap, heading, max_points=None):
     if len(poly) < 3:
         return [], 0
     if overlap == 0:
@@ -366,35 +409,25 @@ def generate_flight_plan(poly, camera, altitude, overlap, heading):
     rows = [row_r.offset(dist) for dist in row_dists]
     
     edges = []
+    num_points = 0
     # Iterate through the parallel lines
     for row in rows:
         # split the row into ranges of distances along the boundaries
         row_sections = split_row(poly, row, G_w, G_h, overlap)
         
         edge_points = []
-        # ignore sub_ranges for simplicity, take overall range from whole row
         for row_section in row_sections:
-            split = split_range(row_section, G_h, overlap)
+            if max_points is not None:
+                split = split_range(row_section, G_h, overlap, max_points=max(max_points - num_points,0))
+            else:
+                split = split_range(row_section, G_h, overlap)
             edge_points += [row.point_along(dist) for dist in split]
+            num_points += len(split)
         edge_points.sort(key = lambda p: row.distance_along(p))
         edges.append(edge_points)
     
-    # Try zig-zagging in both directions and take the shortest option
-    flight_path0, flight_path1 = [], []
-    for edge_num, edge_points in enumerate(edges):
-        # Option 1: Even-numbered edges go in normal order, else reversed
-        if edge_num % 2 == 0:
-            flight_path0 += edge_points
-            edge_points.reverse()
-            flight_path1 += edge_points
-        else:
-            flight_path1 += edge_points
-            edge_points.reverse()
-            flight_path0 += edge_points
-    if flight_path_dist(flight_path0) < flight_path_dist(flight_path1):
-        flight_path = flight_path0
-    else:
-        flight_path = flight_path1
+    flight_path = optimal_route(edges)
+    print("\n\nflight_path\n", flight_path, "\n\n")
     return flight_path
 
 if __name__ == "__main__":

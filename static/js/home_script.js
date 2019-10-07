@@ -8,16 +8,16 @@ function getDocHeight() {
 }
 
 var travel_span = 0.3;
-function amountscrolled(){
+function onScroll(){
     var winheight = window.innerHeight || (document.documentElement || document.body).clientHeight;
     var docheight = getDocHeight();
     var scrollTop = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop;
     var trackLength = docheight - winheight;
-    var pctScrolled = Math.min(scrollTop/480,1); // gets percentage scrolled (ie: 80 or NaN if tracklength == 0)
-	document.getElementById("drone_photo_img").style.marginLeft = (-144 - 0.5 * travel_span * window.innerWidth + pctScrolled * travel_span * window.innerWidth).toString() + "px";
+    var pctScrolled = Math.min(scrollTop/480,1);
+	document.getElementById("drone_photo_img").style.marginLeft = (travel_span * window.innerWidth * (pctScrolled - 0.5) - 144).toString() + "px";
 }
-amountscrolled();
- 
-window.addEventListener("scroll", function(){
-    amountscrolled();
-}, false)
+onScroll();
+document.getElementById("drone_photo_img").style.display = "block";
+
+window.addEventListener("scroll", onScroll, false)
+window.addEventListener("resize", onScroll, false)
