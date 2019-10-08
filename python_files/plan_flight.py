@@ -342,40 +342,54 @@ def optimal_route(edges):
     if len(edges) == 1:
         return edges[0]
     ends = [(edges[i][0], edges[i][-1]) for i in range(len(edges)) if len(edges[i]) > 0]
-    paths = [[[["",0],["",0]],[["",0],["",0]]],
-             [[["00",ends[0][1].dist(ends[1][0])],
-               ["01",ends[0][1].dist(ends[1][1])]],
-              [["10",ends[0][0].dist(ends[1][0])],
-               ["11",ends[0][0].dist(ends[1][1])]]]]
-    i = 2
-    while i < len(ends):
+    
+    # 0 means to iterate through a row in the normal direction
+    # 1 means to iterate through a row in reverse
+    
+    # an "a -> b path" means a path that zig-zags through the rows 
+    #     starting in the a direction and ending in the b direction
+    
+    # initialise the distance for each path
+    # distance spanned by each row is ignored because this is constant 
+    #     regardless of the zig-zag pattern
+    prev_paths = [["00", "01"], ["10", "11"]]
+    prev_dists = [[ends[0][1].dist(ends[1][0]),ends[0][1].dist(ends[1][1])],
+                  [ends[0][0].dist(ends[1][0]),ends[0][0].dist(ends[1][1])]]
+    
+    # iterate through the rows, updating the possible optimal paths each time
+    for i in range(2, len(ends)):
+        new_paths = [[None, None], [None, None]]
+        new_dists = [[None, None], [None, None]]
+        
         for j in range(2):
             for k in range(2):
-                # optimise j - > k path
-                if(paths[(i-1)%2][j][0][1] + ends[i-1][1].dist(ends[i][k]) < 
-                   paths[(i-1)%2][j][1][1] + ends[i-1][0].dist(ends[i][k])): 
-                    paths[i%2][j][k][1] = paths[(i-1)%2][j][0][1] + ends[i-1][1].dist(ends[i][k])
-                    paths[i%2][j][k][0] = paths[(i-1)%2][j][0][0] + str(k)
+                # optimise j -> k path
+                if(prev_dists[j][0] + ends[i-1][1].dist(ends[i][k]) < 
+                   prev_dists[j][1] + ends[i-1][0].dist(ends[i][k])):
+                    # using prev j -> 0 path is shorter
+                    new_paths[j][k] = prev_paths[j][0] + str(k)
+                    new_dists[j][k] = prev_dists[j][0] + ends[i-1][1].dist(ends[i][k])
                 else:
-                    paths[i%2][j][k][1] = paths[(i-1)%2][j][1][1] + ends[i-1][0].dist(ends[i][k])
-                    paths[i%2][j][k][0] = paths[(i-1)%2][j][1][0] + str(k)               
+                    # using prev j -> 1 path is shorter
+                    new_paths[j][k] = prev_paths[j][1] + str(k)
+                    new_dists[j][k] = prev_dists[j][1] + ends[i-1][0].dist(ends[i][k])
         
-        i += 1
+        prev_paths = new_paths
+        prev_dists = new_dists
     
-    end = (len(ends)-1)%2
-    
-    best_path = paths[end][0][0][0]
-    best_dist = paths[end][0][0][1]
+    # get shortest overall path out of 0 -> 0, 0 -> 1, 1 -> 0 and 1 -> 1
+    best_path = prev_paths[0][0]
+    best_dist = prev_dists[0][0]
     for i in range(2):
         for j in range(2):
-            if paths[end][i][j][1] < best_dist:
-                best_dist = paths[end][i][j][1]
-                best_path = paths[end][i][j][0]
+            if prev_dists[i][j] < best_dist:
+                best_path = prev_paths[i][j]
+                best_dist = prev_dists[i][j]
     
     flight_path = []
-    for edge_num, char in enumerate(best_path):
+    for edge_num, direction in enumerate(best_path):
         edge = edges[edge_num]
-        if char == "1":
+        if direction == "1":
             edge.reverse()
         flight_path += edge
     return flight_path
@@ -436,7 +450,6 @@ def generate_flight_plan(poly, camera, altitude, overlap, heading, max_points=No
         edges.append(edge_points)
     
     flight_path = optimal_route(edges)
-    print("\n\nflight_path\n", flight_path, "\n\n")
     return flight_path
 
 if __name__ == "__main__":

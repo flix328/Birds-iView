@@ -1,4 +1,4 @@
-var map = L.map('mapid').setView([-43.5,172.6], 10);
+var map = L.map('mapid').setView([-43.5,172.6], 17);
 map.doubleClickZoom.disable(); 
 map.on('click', onMapClick);
 
