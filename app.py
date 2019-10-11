@@ -49,7 +49,7 @@ def polygon_add():
 	poly.push(_id, p)
 	return jsonify(poly.listify())
 
-MAX_POINTS = 120	
+MAX_POINTS = 99
 # get new flight path
 @app.route('/updatePath')
 def get_path():
@@ -74,12 +74,8 @@ def get_path():
 		total += p0.x * p1.y - p1.x * p0.y
 	area = 0.5 * abs(total)
 	
-	if not flight_plan:
-		dist = "None"
-		num_photos = "Too Many"
-	else:
-		dist = flight_path_dist(flight_plan)
-		num_photos = len(flight_plan)
+	dist = flight_path_dist(flight_plan[:MAX_POINTS])
+	num_photos = len(flight_plan)
 	
 	result = "{}, {}, {}".format(area, dist, num_photos)
 	for p in flight_plan:

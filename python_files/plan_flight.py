@@ -441,7 +441,7 @@ def generate_flight_plan(poly, camera, altitude, overlap, heading, max_points=No
         edge_points = []
         for row_section in row_sections:
             if max_points is not None:
-                split = split_range(row_section, G_h, overlap, max_points=max(max_points - num_points,0))
+                split = split_range(row_section, G_h, overlap, max_points=max(2 * max_points - num_points,0))
             else:
                 split = split_range(row_section, G_h, overlap)
             edge_points += [row.point_along(dist) for dist in split]

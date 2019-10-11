@@ -1,11 +1,13 @@
-var map = L.map('mapid').setView([-43.5,172.6], 17);
+MAX_PHOTOS = 99;
+
+var map = L.map('mapid').setView([-41,173], 6);
 map.doubleClickZoom.disable(); 
 map.on('click', onMapClick);
 
 var poly_data = [];
 
 var map_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-	maxZoom: 20, /* changed from original 18*/
+	maxZoom: 20,
 	attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
 		'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 		'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -17,7 +19,7 @@ function onMapTypeClick(){
 	if(is_satellite){
 		map.removeLayer(map_layer);
 		map_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-			maxZoom: 20, /* changed from original 18*/
+			maxZoom: 20,
 			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
 				'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 				'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -31,7 +33,7 @@ function onMapTypeClick(){
 	else{
 		map.removeLayer(map_layer);
 		map_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-			maxZoom: 20, /* changed from original 18*/
+			maxZoom: 20,
 			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
 				'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 				'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -61,6 +63,15 @@ var pathIcon = L.icon({
 	popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
 });
 
+var extra_pathIcon = L.icon({
+	
+	iconUrl: "/static/images/extra_path_marker.png",
+
+	iconSize:     [8, 8], // size of the icon
+	iconAnchor:   [4, 4], // point of the icon which will correspond to marker's location
+	popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+});
+
 
 var poly_marker_keys = {icon: polyIcon, draggable: 'true', autoPan: 'true', autoPanPadding: [60, 50]};
 var poly_markers = L.layerGroup().addTo(map);
@@ -68,22 +79,24 @@ var poly_keys = {fillColor: '#3d8ea1', fillOpacity: 0.2, color: '#3d8ea1'};
 var poly_shape = L.polygon([], poly_keys).addTo(map);
 
 function onMarkerClick(e) {
-	var _id = e.target._leaflet_id;
-	var i = 0;
-	result = [];
-	poly = [];
-	for (var i = 0; i < poly_data.length; i=i+1) {
-		if(poly_data[i][0] != _id){
-			result.push(poly_data[i]);
-			poly.push([poly_data[i][1],poly_data[i][2]]);
+	if(!is_querying){
+		var _id = e.target._leaflet_id;
+		var i = 0;
+		result = [];
+		poly = [];
+		for (var i = 0; i < poly_data.length; i=i+1) {
+			if(poly_data[i][0] != _id){
+				result.push(poly_data[i]);
+				poly.push([poly_data[i][1],poly_data[i][2]]);
+			}
 		}
+		poly_data = result;
+		map.removeLayer(poly_shape);
+		map.removeLayer(e.target);
+		poly_shape = L.polygon(poly, poly_keys).addTo(map);
+		
+		update_path();
 	}
-	poly_data = result;
-	map.removeLayer(poly_shape);
-	map.removeLayer(e.target);
-	poly_shape = L.polygon(poly, poly_keys).addTo(map);
-	
-	update_path();
 }
 
 function onMarkerDragend(e){
@@ -103,29 +116,33 @@ function onMarkerDragend(e){
 	update_path();
 }
 
+var is_querying = false;
 function onMapClick(e) {
-	//var marker = L.marker(e.latlng, Object.assign({}, poly_marker_keys, {title: e.latlng})).addTo(poly_markers);
-	var marker = L.marker(e.latlng, poly_marker_keys).addTo(poly_markers);
-	marker.on('click', onMarkerClick);
-	var out_str = "0, 0, 0, 0, 0, " + poly_data.toString();
-	
-	$.getJSON('/onMapClick',{poly: out_str, lat: e.latlng.lat, lng: e.latlng.lng, _id: marker._leaflet_id}, function(data) {
-		data = data.toString().split(",");
-		for(var i = 0; i < data.length; i=i+1){
-			data[i] = parseFloat(data[i]);
-		}
-		poly = [];
-		poly_data = [];
-		for (var i = 0; i < data.length; i=i+3) {
-			poly.push([data[i+1], data[i+2]]);
-			poly_data.push([data[i], data[i+1], data[i+2]]);
-		}
-		map.removeLayer(poly_shape);
-		marker.on('dragend', onMarkerDragend);
-		poly_shape = L.polygon(poly, poly_keys).addTo(map);
-		update_path();
-	});
-	
+	// if website is not busy
+	if(!is_querying){
+		is_querying = true;
+		var marker = L.marker(e.latlng, poly_marker_keys).addTo(poly_markers);
+		marker.on('click', onMarkerClick);
+		var out_str = "0, 0, 0, 0, 0, " + poly_data.toString();
+		
+		$.getJSON('/onMapClick',{poly: out_str, lat: e.latlng.lat, lng: e.latlng.lng, _id: marker._leaflet_id}, function(data) {
+			data = data.toString().split(",");
+			for(var i = 0; i < data.length; i=i+1){
+				data[i] = parseFloat(data[i]);
+			}
+			poly = [];
+			poly_data = [];
+			for (var i = 0; i < data.length; i=i+3) {
+				poly.push([data[i+1], data[i+2]]);
+				poly_data.push([data[i], data[i+1], data[i+2]]);
+			}
+			map.removeLayer(poly_shape);
+			marker.on('dragend', onMarkerDragend);
+			poly_shape = L.polygon(poly, poly_keys).addTo(map);
+			update_path();
+			is_querying = false;
+		});
+	}
 }
 
 var path_data = [];
@@ -133,6 +150,9 @@ var path_keys = {color: '#FF3B3F', dashArray: "12 6"};
 var path_shape = L.polyline([], path_keys).addTo(map);
 var path_marker_keys = {icon: pathIcon, draggable: 'false'};
 var path_markers = L.layerGroup().addTo(map);
+var extra_path_keys = {color: '#515151', dashArray: "9 9"};
+var extra_path_shape = L.polyline([], extra_path_keys).addTo(map);
+var extra_path_marker_keys = {icon: extra_pathIcon, draggable: 'false'};
 
 function update_path(){
 	if(poly_data.length < 3){
@@ -161,6 +181,9 @@ function update_path(){
 		var poly_area_str = (parseFloat(data[0]).toPrecision(2) / 1000000).toString() + "km²";
 		var dist_str = (parseFloat(data[1]).toPrecision(2) / 1000).toString() + "km";
 		var num_photos_str = data[2].toString();
+		if(parseFloat(data[2]) > MAX_PHOTOS){
+			num_photos_str = MAX_PHOTOS.toString() + "+"
+		}
 		
 		
 		$("#stat_area").text('Survey Area: ' + poly_area_str);
@@ -174,11 +197,16 @@ function update_path(){
 			path.push([lat, lng]);
 		}
 		map.removeLayer(path_shape);
-		path_shape = L.polyline(path, path_keys).addTo(map);
+		path_shape = L.polyline(path.slice(0, MAX_PHOTOS), path_keys).addTo(map);
+		map.removeLayer(extra_path_shape);
+		extra_path_shape = L.polyline(path.slice(MAX_PHOTOS-1,path.length), extra_path_keys).addTo(map);
 		map.removeLayer(path_markers);
 		path_markers = L.layerGroup().addTo(map);
-		for(var i=0; i<path.length; i++){
+		for(var i=0; i<Math.min(path.length,MAX_PHOTOS); i++){
 			var marker = L.marker(path[i], path_marker_keys).addTo(path_markers);
+		}
+		for(var i=MAX_PHOTOS; i<path.length; i++){
+			var marker = L.marker(path[i], extra_path_marker_keys).addTo(path_markers);
 		}
 		path_data = path;
 	});
@@ -266,6 +294,8 @@ function onClearClick() {
 	path_data = [];
 	map.removeLayer(path_shape);
 	path_shape = L.polyline([], path_keys).addTo(map);
+	map.removeLayer(extra_path_shape);
+	extra_path_shape = L.polyline([], extra_path_keys).addTo(map);
 	update_path();
 }
 var adjusting_altitude = false;
@@ -507,7 +537,9 @@ function extract_resolution(str){
 	if(parts.length == 2 && !isNaN(parts[0]) && !isNaN(parts[1])){
 		var res_w = parseFloat(parts[0]);
 		var res_h = parseFloat(parts[1]);
-		return [res_w, res_h];
+		if(res_w > 0 && res_h > 0){
+			return [res_w, res_h];
+		}
 	}	
 }
 
@@ -607,7 +639,7 @@ function onExportClick(){
 	var csv = "latitude,longitude,altitude(m),heading(deg),curvesize(m),rotationdir,gimbalmode,gimbalpitchangle,actiontype1,actionparam1,actiontype2,actionparam2,actiontype3,actionparam3,actiontype4,actionparam4,actiontype5,actionparam5,actiontype6,actionparam6,actiontype7,actionparam7,actiontype8,actionparam8,actiontype9,actionparam9,actiontype10,actionparam10,actiontype11,actionparam11,actiontype12,actionparam12,actiontype13,actionparam13,actiontype14,actionparam14,actiontype15,actionparam15,altitudemode,speed(m/s),poi_latitude,poi_longitude,poi_altitude(m),poi_altitudemode,photo_timeinterval\n";
 	
 	
-	for(var i=0; i<path_data.length; i++){
+	for(var i=0; i<Math.min(path_data.length, MAX_PHOTOS); i++){
 		var lat = path_data[i][0];
 		var lon = path_data[i][1];
 		

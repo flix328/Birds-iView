@@ -6,8 +6,7 @@ body, html {
 }
 
 header {
-	display: flex;
-	justify-content: space-between;
+	display: block;
 	
 	background-color: white;
 	border-bottom-style: solid;
@@ -17,21 +16,25 @@ header {
 }
 
 #logo {
-	flex-grow: 0;
 	margin: 7px;
+	display: block;
+	position: absolute;
 }
 
 #logo a img {
+	display:
 	object-fit: contain;
-	height: 100%;
+	height: 46px;
 	width: auto;
 }
 
 nav {
+	right:0;
+	position: absolute;
 	display: flex;
-	flex-grow: 0;
 	margin: 7px;
 	align-items: center;
+	height: 46px;
 }
 
 nav a {
