@@ -1,6 +1,6 @@
 MAX_PHOTOS = 99;
 
-var map = L.map('mapid').setView([-41,173], 6);
+var map = L.map('mapid').setView([-41,173], 17);
 map.doubleClickZoom.disable(); 
 map.on('click', onMapClick);
 
@@ -73,33 +73,37 @@ var extra_pathIcon = L.icon({
 });
 
 
-var poly_marker_keys = {icon: polyIcon, draggable: 'true', autoPan: 'true', autoPanPadding: [60, 50]};
+var poly_marker_keys = {icon: polyIcon, draggable: true, autoPan: true, autoPanPadding: [60, 50]};
 var poly_markers = L.layerGroup().addTo(map);
-var poly_keys = {fillColor: '#3d8ea1', fillOpacity: 0.2, color: '#3d8ea1'};
-var poly_shape = L.polygon([], poly_keys).addTo(map);
+var poly_shape = L.polygon([], {fillColor: '#3d8ea1', fillOpacity: 0.2, color: '#3d8ea1'}).addTo(map);
 
 function onMarkerClick(e) {
-	if(!is_querying){
-		var _id = e.target._leaflet_id;
-		var i = 0;
-		result = [];
-		poly = [];
-		for (var i = 0; i < poly_data.length; i=i+1) {
-			if(poly_data[i][0] != _id){
-				result.push(poly_data[i]);
-				poly.push([poly_data[i][1],poly_data[i][2]]);
-			}
+	if(is_busy){ return; }
+	is_busy = true;
+	
+	var _id = e.target._leaflet_id;
+	var i = 0;
+	result = [];
+	poly = [];
+	for (var i = 0; i < poly_data.length; i=i+1) {
+		if(poly_data[i][0] != _id){
+			result.push(poly_data[i]);
+			poly.push([poly_data[i][1],poly_data[i][2]]);
 		}
-		poly_data = result;
-		map.removeLayer(poly_shape);
-		map.removeLayer(e.target);
-		poly_shape = L.polygon(poly, poly_keys).addTo(map);
-		
-		update_path();
 	}
+	map.removeLayer(e.target);
+	poly_data = result;
+	poly_shape.setLatLngs(poly);
+	
+	update_path();
+	
+	is_busy = false;
 }
 
 function onMarkerDragend(e){
+	if(is_busy){ return; }
+	is_busy = true;
+	
 	_id = e.target._leaflet_id
 	
 	poly = [];
@@ -110,73 +114,71 @@ function onMarkerDragend(e){
 		}
 		poly.push([poly_data[i][1], poly_data[i][2]]);
 	}
-	map.removeLayer(poly_shape);
-	poly_shape = L.polygon(poly, poly_keys).addTo(map);
+	poly_shape.setLatLngs(poly);
 	
 	update_path();
+	
+	is_busy = false;
 }
 
-var is_querying = false;
+var is_busy = false;
 function onMapClick(e) {
+	console.log("starting onMapClick function");
 	// if website is not busy
-	if(!is_querying){
-		is_querying = true;
-		var marker = L.marker(e.latlng, poly_marker_keys).addTo(poly_markers);
-		marker.on('click', onMarkerClick);
-		var out_str = "0, 0, 0, 0, 0, " + poly_data.toString();
-		
-		$.getJSON('/onMapClick',{poly: out_str, lat: e.latlng.lat, lng: e.latlng.lng, _id: marker._leaflet_id}, function(data) {
-			data = data.toString().split(",");
-			for(var i = 0; i < data.length; i=i+1){
-				data[i] = parseFloat(data[i]);
-			}
-			poly = [];
-			poly_data = [];
-			for (var i = 0; i < data.length; i=i+3) {
-				poly.push([data[i+1], data[i+2]]);
-				poly_data.push([data[i], data[i+1], data[i+2]]);
-			}
-			map.removeLayer(poly_shape);
-			marker.on('dragend', onMarkerDragend);
-			poly_shape = L.polygon(poly, poly_keys).addTo(map);
-			update_path();
-			is_querying = false;
-		});
-	}
+	if(is_busy){ return; }
+	is_busy = true;
+	
+	var marker = L.marker(e.latlng, poly_marker_keys).addTo(poly_markers);
+	marker.on('click', onMarkerClick);
+	$.getJSON('/onMapClick',{poly_data: poly_data.toString(), lat: e.latlng.lat, lng: e.latlng.lng, _id: marker._leaflet_id}, function(data) {
+		data = data.toString().split(",");
+		for(var i = 0; i < data.length; i=i+1){
+			data[i] = parseFloat(data[i]);
+		}
+		poly = [];
+		poly_data = [];
+		for (var i = 0; i < data.length; i=i+3) {
+			poly.push([data[i+1], data[i+2]]);
+			poly_data.push([data[i], data[i+1], data[i+2]]);
+		}
+		marker.on('dragend', onMarkerDragend);
+		poly_shape.setLatLngs(poly);
+		update_path();
+		console.log("finishing the onMapClick section thing");
+	});
+	console.log("finishing onMapClick function");
 }
 
 var path_data = [];
-var path_keys = {color: '#FF3B3F', dashArray: "12 6"};
-var path_shape = L.polyline([], path_keys).addTo(map);
-var path_marker_keys = {icon: pathIcon, draggable: 'false'};
+var path_shape = L.polyline([], {color: '#FF3B3F', dashArray: "12 6"}).addTo(map);
 var path_markers = L.layerGroup().addTo(map);
-var extra_path_keys = {color: '#515151', dashArray: "9 9"};
-var extra_path_shape = L.polyline([], extra_path_keys).addTo(map);
-var extra_path_marker_keys = {icon: extra_pathIcon, draggable: 'false'};
+var extra_path_shape = L.polyline([], {color: '#515151', dashArray: "9 9"}).addTo(map);
 
 function update_path(){
+	is_busy = true;
 	if(poly_data.length < 3){
-		map.removeLayer(path_markers);
-		path_markers = L.layerGroup().addTo(map);
-		map.removeLayer(path_shape);
-		path_shape = L.polyline([], path_keys).addTo(map);
+		path_markers.clearLayers();
+		path_data = [];
+		path_shape.setLatLngs([]);
+		extra_path_shape.setLatLngs([]);
+		
 		
 		$("#stat_area").text('Survey Area: None');
 		$("#stat_dist").text('Flight Distance: None');
 		$("#stat_num_photos").text('Number of Photos: None');
+		is_busy = false;
 		return;
 	}
 	var altitude = parseFloat(document.getElementById("altitude_value").value.slice(0, -1));
 	var heading = parseFloat(document.getElementById("heading_value").value.slice(0, -1));
-	var overlap = parseFloat(document.getElementById("overlap_value").value.slice(0, -1));
-	var res = document.getElementById("resolution_input").value;
+	var overlap = parseFloat(document.getElementById("overlap_value").value.slice(0, -1)) * 0.01;
+	var resolution = document.getElementById("resolution_input").value;
 	var view_angle = parseFloat(document.getElementById("view_angle_input").value);
 	
 	
-	var out_str = altitude.toString() + ", " + heading.toString() + ", " + overlap.toString() + ", " + res.toString() + ", " + view_angle.toString() + ", " + poly_data.toString();
 	
-	
-	$.getJSON('/updatePath',{data: out_str}, function(data) {
+	$.getJSON('/updatePath',{altitude: altitude, heading: heading, overlap: overlap, resolution: resolution, view_angle: view_angle, poly_data: poly_data.toString()}, function(data) {
+		is_busy = true;
 		data = data.toString().split(",");
 		var poly_area_str = (parseFloat(data[0]).toPrecision(2) / 1000000).toString() + "km²";
 		var dist_str = (parseFloat(data[1]).toPrecision(2) / 1000).toString() + "km";
@@ -196,22 +198,19 @@ function update_path(){
 			lng = parseFloat(data[i+1]);
 			path.push([lat, lng]);
 		}
-		map.removeLayer(path_shape);
-		path_shape = L.polyline(path.slice(0, MAX_PHOTOS), path_keys).addTo(map);
-		map.removeLayer(extra_path_shape);
-		extra_path_shape = L.polyline(path.slice(MAX_PHOTOS-1,path.length), extra_path_keys).addTo(map);
+		path_shape.setLatLngs(path.slice(0, MAX_PHOTOS));
+		extra_path_shape.setLatLngs(path.slice(MAX_PHOTOS-1,path.length));
 		map.removeLayer(path_markers);
 		path_markers = L.layerGroup().addTo(map);
 		for(var i=0; i<Math.min(path.length,MAX_PHOTOS); i++){
-			var marker = L.marker(path[i], path_marker_keys).addTo(path_markers);
+			L.marker(path[i], {icon:pathIcon, draggable: false}).addTo(path_markers);
 		}
 		for(var i=MAX_PHOTOS; i<path.length; i++){
-			var marker = L.marker(path[i], extra_path_marker_keys).addTo(path_markers);
+			L.marker(path[i], {icon:extra_pathIcon, draggable: false}).addTo(path_markers);
 		}
 		path_data = path;
+		is_busy = false;
 	});
-	
-	
 }
 
 
@@ -284,19 +283,20 @@ $( function() {
 } );
 
 function onClearClick() {
-	map.removeLayer(poly_markers);
-	poly_markers = L.layerGroup().addTo(map);
-	map.removeLayer(path_markers);
-	path_markers = L.layerGroup().addTo(map);
+	console.log("starting onClearClick function");
+	if(is_busy){ return; }
+	is_busy = true;
+	
+	path_markers.clearLayers();
 	poly_data = [];
-	map.removeLayer(poly_shape);
-	poly_shape = L.polygon([], poly_keys).addTo(map);
+	poly_shape.setLatLngs([]);
+	poly_markers.clearLayers();
 	path_data = [];
-	map.removeLayer(path_shape);
-	path_shape = L.polyline([], path_keys).addTo(map);
-	map.removeLayer(extra_path_shape);
-	extra_path_shape = L.polyline([], extra_path_keys).addTo(map);
-	update_path();
+	path_shape.setLatLngs([]);
+	extra_path_shape.setLatLngs([]);
+	//update_path();
+	is_busy = false;
+	console.log("finishing onClearClick function");
 }
 var adjusting_altitude = false;
 function onAltitudeClick(){

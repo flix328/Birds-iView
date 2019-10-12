@@ -11,6 +11,7 @@ def edge_point_dist(S, p):
         # p_int is the closest point
         return p.dist(p_int)
 
+'''
 def format_input_data(data):
     poly = Polygon()
     split = data.split(',')
@@ -20,8 +21,6 @@ def format_input_data(data):
     resolution = split[3]
     view_angle = float(split[4])
     
-    
-    
     nums = []
     for value in split[5:]:
         try:
@@ -30,4 +29,4 @@ def format_input_data(data):
             continue
     for i in range(0, len(nums), 3):
         poly.push_end(nums[i], Point(nums[i+1], nums[i+2]))
-    return altitude, heading, overlap, resolution, view_angle, poly
+    return altitude, heading, overlap, resolution, view_angle, poly'''

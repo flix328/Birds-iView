@@ -1,12 +1,14 @@
 # https://www.tutorialspoint.com/flask/flask_sqlite.htm
 # http://flask.pocoo.org/docs/0.12/patterns/sqlite3/
 # https://github.com/stevedunford/NZVintageRadios
+# https://blog.pythonanywhere.com/121/
 
 from flask import Flask, render_template, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
 # Creates a Flask object called 'app' that we can use throughout the programme
 app = Flask(__name__)
+
 SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
     username="flix328",
     password="59AV8wYEq@beyN6",
@@ -16,7 +18,14 @@ SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostnam
 app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-birds_db = SQLAlchemy(app)
+db = SQLAlchemy(app)
+
+class Bird(db.Model):
+    __tablename__ = "birds"
+    
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String(4096))
+
 
 # This is the function that controls the main page of the web site
 @app.route("/")
@@ -48,8 +57,14 @@ from interface import *
 # map click function happening without any refreshing
 @app.route('/onMapClick')
 def polygon_add():
-	data = request.args['poly']
-	altitude, heading, overlap, resolution, view_angle, poly = format_input_data(data)
+	print("poly_data: '", request.args['poly_data']+"'")
+	poly_data = [float(s) for s in request.args['poly_data'].split(',') if not (s+" ").isspace()]
+	
+	poly = Polygon()
+	for i in range(0, len(poly_data), 3):
+		_id = poly_data[i]
+		p = Point(poly_data[i+1], poly_data[i+2])
+		poly.push_end(_id, p)
 
 	lat = float(request.args['lat'])
 	lon = float(request.args['lng'])
@@ -63,9 +78,19 @@ MAX_POINTS = 99
 # get new flight path
 @app.route('/updatePath')
 def get_path():
-	data = request.args['data']
-	altitude, heading, overlap, resolution, view_angle, poly = format_input_data(data)
-
+	altitude = float(request.args['altitude'])
+	heading = float(request.args['heading'])
+	overlap = float(request.args['overlap'])
+	resolution = request.args['resolution']
+	view_angle = float(request.args['view_angle'])
+	poly_data = [float(num) for num in request.args['poly_data'].split(',')]
+	
+	poly = Polygon()
+	for i in range(0, len(poly_data), 3):
+		_id = poly_data[i]
+		p = Point(poly_data[i+1], poly_data[i+2])
+		poly.push_end(_id, p)
+	
 	gs = [Objects_GPS.Point(lat, lng) for _, lat, lng in poly.listify()]
 	# convert GPS points to 2D points
 	p3Ds = [gps_to_xyz(g) for g in gs]
