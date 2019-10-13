@@ -13,7 +13,7 @@ SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostnam
     username="flix328",
     password="59AV8wYEq@beyN6",
     hostname="flix328.mysql.pythonanywhere-services.com",
-    databasename="flix328$birds"
+    databasename="flix328$birds_iview"
 )
 app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
@@ -22,10 +22,10 @@ db = SQLAlchemy(app)
 
 class Bird(db.Model):
     __tablename__ = "birds"
-    
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(4096))
 
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(4096))
+    size = db.Column(db.Float())
 
 # This is the function that controls the main page of the web site
 @app.route("/")
@@ -54,12 +54,15 @@ from plan_flight import *
 from earth_view import *
 from interface import *
 
+@app.route('/getBirds')
+def get_birds():
+	return jsonify(Bird.query.all())
+
 # map click function happening without any refreshing
 @app.route('/onMapClick')
 def polygon_add():
-	print("poly_data: '", request.args['poly_data']+"'")
 	poly_data = [float(s) for s in request.args['poly_data'].split(',') if not (s+" ").isspace()]
-	
+
 	poly = Polygon()
 	for i in range(0, len(poly_data), 3):
 		_id = poly_data[i]
@@ -84,13 +87,13 @@ def get_path():
 	resolution = request.args['resolution']
 	view_angle = float(request.args['view_angle'])
 	poly_data = [float(num) for num in request.args['poly_data'].split(',')]
-	
+
 	poly = Polygon()
 	for i in range(0, len(poly_data), 3):
 		_id = poly_data[i]
 		p = Point(poly_data[i+1], poly_data[i+2])
 		poly.push_end(_id, p)
-	
+
 	gs = [Objects_GPS.Point(lat, lng) for _, lat, lng in poly.listify()]
 	# convert GPS points to 2D points
 	p3Ds = [gps_to_xyz(g) for g in gs]
@@ -124,4 +127,5 @@ def get_path():
 #def page_not_found(e):
 #  return render_template('404.html', title="404"), 404
 
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)

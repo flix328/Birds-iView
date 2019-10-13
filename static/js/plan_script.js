@@ -1,7 +1,7 @@
 MAX_PHOTOS = 99;
 
-var map = L.map('mapid').setView([-41,173], 17);
-map.doubleClickZoom.disable(); 
+var map = L.map('mapid').setView([-41,173], 6);
+map.doubleClickZoom.disable();
 map.on('click', onMapClick);
 
 var poly_data = [];
@@ -46,7 +46,7 @@ function onMapTypeClick(){
 }
 
 var polyIcon = L.icon({
-	
+
 	iconUrl: "/static/images/poly_marker.png",
 
 	iconSize:     [15, 15], // size of the icon
@@ -55,7 +55,7 @@ var polyIcon = L.icon({
 });
 
 var pathIcon = L.icon({
-	
+
 	iconUrl: "/static/images/path_marker.png",
 
 	iconSize:     [8, 8], // size of the icon
@@ -64,7 +64,7 @@ var pathIcon = L.icon({
 });
 
 var extra_pathIcon = L.icon({
-	
+
 	iconUrl: "/static/images/extra_path_marker.png",
 
 	iconSize:     [8, 8], // size of the icon
@@ -80,7 +80,7 @@ var poly_shape = L.polygon([], {fillColor: '#3d8ea1', fillOpacity: 0.2, color: '
 function onMarkerClick(e) {
 	if(is_busy){ return; }
 	is_busy = true;
-	
+
 	var _id = e.target._leaflet_id;
 	var i = 0;
 	result = [];
@@ -94,18 +94,18 @@ function onMarkerClick(e) {
 	map.removeLayer(e.target);
 	poly_data = result;
 	poly_shape.setLatLngs(poly);
-	
+
 	update_path();
-	
+
 	is_busy = false;
 }
 
 function onMarkerDragend(e){
 	if(is_busy){ return; }
 	is_busy = true;
-	
+
 	_id = e.target._leaflet_id
-	
+
 	poly = [];
 	for (var i = 0; i < poly_data.length; i=i+1) {
 		if(poly_data[i][0] == _id){
@@ -115,9 +115,9 @@ function onMarkerDragend(e){
 		poly.push([poly_data[i][1], poly_data[i][2]]);
 	}
 	poly_shape.setLatLngs(poly);
-	
+
 	update_path();
-	
+
 	is_busy = false;
 }
 
@@ -127,7 +127,7 @@ function onMapClick(e) {
 	// if website is not busy
 	if(is_busy){ return; }
 	is_busy = true;
-	
+
 	var marker = L.marker(e.latlng, poly_marker_keys).addTo(poly_markers);
 	marker.on('click', onMarkerClick);
 	$.getJSON('/onMapClick',{poly_data: poly_data.toString(), lat: e.latlng.lat, lng: e.latlng.lng, _id: marker._leaflet_id}, function(data) {
@@ -161,8 +161,8 @@ function update_path(){
 		path_data = [];
 		path_shape.setLatLngs([]);
 		extra_path_shape.setLatLngs([]);
-		
-		
+
+
 		$("#stat_area").text('Survey Area: None');
 		$("#stat_dist").text('Flight Distance: None');
 		$("#stat_num_photos").text('Number of Photos: None');
@@ -174,9 +174,9 @@ function update_path(){
 	var overlap = parseFloat(document.getElementById("overlap_value").value.slice(0, -1)) * 0.01;
 	var resolution = document.getElementById("resolution_input").value;
 	var view_angle = parseFloat(document.getElementById("view_angle_input").value);
-	
-	
-	
+
+
+
 	$.getJSON('/updatePath',{altitude: altitude, heading: heading, overlap: overlap, resolution: resolution, view_angle: view_angle, poly_data: poly_data.toString()}, function(data) {
 		is_busy = true;
 		data = data.toString().split(",");
@@ -186,12 +186,12 @@ function update_path(){
 		if(parseFloat(data[2]) > MAX_PHOTOS){
 			num_photos_str = MAX_PHOTOS.toString() + "+"
 		}
-		
-		
+
+
 		$("#stat_area").text('Survey Area: ' + poly_area_str);
 		$("#stat_dist").text('Flight Distance: ' + dist_str);
 		$("#stat_num_photos").text('Number of Photos: ' + num_photos_str);
-		
+
 		var path = [];
 		for(var i = 3; i < data.length; i=i+2){
 			lat = parseFloat(data[i]);
@@ -215,13 +215,13 @@ function update_path(){
 
 
 var controlID = document.getElementById("controls");
-L.DomEvent.disableClickPropagation(controlID); 
+L.DomEvent.disableClickPropagation(controlID);
 L.DomEvent.disableScrollPropagation(controlID);
 var map_typeID = document.getElementById("map_type");
-L.DomEvent.disableClickPropagation(map_typeID); 
+L.DomEvent.disableClickPropagation(map_typeID);
 L.DomEvent.disableScrollPropagation(map_typeID);
 var summary_boxID = document.getElementById("summary_box");
-L.DomEvent.disableClickPropagation(summary_boxID); 
+L.DomEvent.disableClickPropagation(summary_boxID);
 L.DomEvent.disableScrollPropagation(summary_boxID);
 
 $( function() {
@@ -278,7 +278,7 @@ $( function() {
 		stop: function( event, ui ) {
 			on_update();
 		},
-		
+
     });
 } );
 
@@ -286,7 +286,7 @@ function onClearClick() {
 	console.log("starting onClearClick function");
 	if(is_busy){ return; }
 	is_busy = true;
-	
+
 	path_markers.clearLayers();
 	poly_data = [];
 	poly_shape.setLatLngs([]);
@@ -306,12 +306,12 @@ function onAltitudeClick(){
 		document.getElementById('altitude_btn').style.borderTopRightRadius = "0";
 		document.getElementById('birds_btn').style.borderBottomRightRadius = "0";
 		document.getElementById('altitude_box').style.display = "block";
-		
+
 		document.getElementById('heading_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('overlap_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('camera_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('birds_btn').style.filter = "opacity(0.6) grayscale(1)";
-		
+
 		adjusting_altitude = true;
 	}
 	else{
@@ -326,17 +326,17 @@ function onHeadingClick(){
 		document.getElementById('altitude_btn').style.borderTopRightRadius = "0";
 		document.getElementById('birds_btn').style.borderBottomRightRadius = "0";
 		document.getElementById('heading_box').style.display = "block";
-		
+
 		document.getElementById('altitude_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('overlap_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('camera_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('birds_btn').style.filter = "opacity(0.6) grayscale(1)";
-		
+
 		adjusting_heading = true;
 	}
 	else{
 		reset_adjust_boxes();
-		
+
 	}
 }
 var adjusting_overlap = false;
@@ -347,12 +347,12 @@ function onOverlapClick(){
 		document.getElementById('altitude_btn').style.borderTopRightRadius = "0";
 		document.getElementById('birds_btn').style.borderBottomRightRadius = "0";
 		document.getElementById('overlap_box').style.display = "block";
-		
+
 		document.getElementById('altitude_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('heading_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('camera_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('birds_btn').style.filter = "opacity(0.6) grayscale(1)";
-		
+
 		adjusting_overlap = true;
 	}
 	else{
@@ -366,12 +366,12 @@ function onCameraClick(){
 		disable_adjust_labels();
 		document.getElementById('camera_box').style.display = "block";
 		document.getElementById('birds_btn').style.borderBottomRightRadius = "0";
-		
+
 		document.getElementById('altitude_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('heading_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('overlap_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('birds_btn').style.filter = "opacity(0.6) grayscale(1)";
-		
+
 		adjusting_camera = true;
 	}
 	else{
@@ -387,12 +387,12 @@ function onBirdClick(){
 		document.getElementById('birds_btn').style.borderBottomRightRadius = "0";
 		document.getElementById('bird_box').style.display = "block";
 		document.getElementById("bird_input").focus();
-		
+
 		document.getElementById('altitude_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('heading_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('overlap_btn').style.filter = "opacity(0.6) grayscale(1)";
 		document.getElementById('camera_btn').style.filter = "opacity(0.6) grayscale(1)";
-		
+
 		adjusting_birds = true;
 	}
 	else{
@@ -437,6 +437,28 @@ $(document).keyup(function(e) {
     }
 });
 
+// Initializing the Bird class
+class Bird {
+    constructor(name, size) {
+        this.name = name;
+        this.size = size;
+    }
+}
+
+function get_birds(){
+    console.log("test");
+    var birds = [];
+    $.getJSON('/getBirds',{}, function(data) {
+        for(i=0;i<data.length();i++){
+            console.log(data[i]);
+        }
+    });
+}
+
+
+var birds = get_birds();
+
+
 var birds = ["Banded dotterel", "Black stilt", "Black-billed gull", "Black-fronted tern", "Caspian tern", "Pied stilt", "Red-billed gull", "South Island pied oystercatcher", "Variable oystercatcher", "White-fronted tern", "Wrybill"];
 var bird_size = {"Banded dotterel":20, "Black stilt":40, "Black-billed gull":35, "Black-fronted tern":28, "Caspian tern":50, "Pied stilt":35, "Red-billed gull":37, "South Island pied oystercatcher": 46, "Variable oystercatcher":48, "White-fronted tern":42, "Wrybill":20}
 
@@ -449,9 +471,9 @@ function simplify_string(str){
 function check_bird_complete(){
 	bird_input = document.getElementById("bird_input").value;
 	bird_input = simplify_string(bird_input);
-	
+
 	var result = ""
-	
+
 	var matches = [];
 	for(var i=0; i<birds.length; i++){
 		bird_name = birds[i];
@@ -494,7 +516,7 @@ function check_bird_complete(){
 	else{
 		complete_input.value = "";
 		complete_input.style.visibility = "hidden";
-		
+
 	}
 }
 
@@ -519,14 +541,14 @@ function add_bird(){
 		document.getElementById("bird_input").value = "";
 		check_bird_complete();
 	}
-	
+
 	document.getElementById("bird_input").focus();
 	check_birds();
 }
 
 function remove_bird(bird_name){
 	var index = birds_used.indexOf(bird_name);
-	
+
 	var bird_list = document.getElementById("bird_list")
 	bird_list.removeChild(bird_list.childNodes[index]);
 	birds_used.splice(index, 1);
@@ -540,7 +562,7 @@ function extract_resolution(str){
 		if(res_w > 0 && res_h > 0){
 			return [res_w, res_h];
 		}
-	}	
+	}
 }
 
 var resolution = [960, 640];
@@ -562,7 +584,7 @@ function on_view_angle_value_change(){
 		document.getElementById("view_angle_input").value = view_angle.toString();
 	}
 	else{
-		view_angle = parseFloat(str); 
+		view_angle = parseFloat(str);
 	}
 	on_update();
 }
@@ -598,7 +620,7 @@ function check_birds(){
 	var res_w = res[0];
 	var res_h = res[1];
 	G = 2 * h * Math.tan(a / 2  * Math.PI/180) / Math.sqrt(Math.pow(res_w, 2) + Math.pow(res_h, 2)) * 100
-	
+
 	for(var i=0; i<birds_used.length; i++){
 		size = bird_size[birds_used[i]];
 		if(G < 0.5 * size){
@@ -624,7 +646,7 @@ function download_csv() {
             csv += row.join(',');
             csv += "\n";
     });
- 
+
     var hiddenElement = document.createElement('a');
     hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
     hiddenElement.target = '_blank';
@@ -635,14 +657,14 @@ function download_csv() {
 function onExportClick(){
 	var altitude = parseFloat(document.getElementById("altitude_value").value.slice(0, -1));
 	var heading = parseFloat(document.getElementById("heading_value").value.slice(0, -1));
-	
+
 	var csv = "latitude,longitude,altitude(m),heading(deg),curvesize(m),rotationdir,gimbalmode,gimbalpitchangle,actiontype1,actionparam1,actiontype2,actionparam2,actiontype3,actionparam3,actiontype4,actionparam4,actiontype5,actionparam5,actiontype6,actionparam6,actiontype7,actionparam7,actiontype8,actionparam8,actiontype9,actionparam9,actiontype10,actionparam10,actiontype11,actionparam11,actiontype12,actionparam12,actiontype13,actionparam13,actiontype14,actionparam14,actiontype15,actionparam15,altitudemode,speed(m/s),poi_latitude,poi_longitude,poi_altitude(m),poi_altitudemode,photo_timeinterval\n";
-	
-	
+
+
 	for(var i=0; i<Math.min(path_data.length, MAX_PHOTOS); i++){
 		var lat = path_data[i][0];
 		var lon = path_data[i][1];
-		
+
 		row = lat.toString() + "," + lon.toString() + "," + altitude.toString() + "," + heading.toString() + ",0,0,0,0,";
 		if(i==0){
 			row += "5,-90,"
