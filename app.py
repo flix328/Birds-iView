@@ -27,6 +27,15 @@ class Bird(db.Model):
     name = db.Column(db.String(4096))
     size = db.Column(db.Float())
 
+@app.route('/getBirds')
+def get_birds():
+    birds = Bird.query.all()
+    result = ""
+    for bird in birds:
+        result += "{},{},".format(bird.name, bird.size)
+    print("result", result)
+    return jsonify(result)
+
 # This is the function that controls the main page of the web site
 @app.route("/")
 def index():
@@ -53,10 +62,6 @@ import Objects_2D
 from plan_flight import *
 from earth_view import *
 from interface import *
-
-@app.route('/getBirds')
-def get_birds():
-	return jsonify(Bird.query.all())
 
 # map click function happening without any refreshing
 @app.route('/onMapClick')

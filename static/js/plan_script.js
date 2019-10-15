@@ -287,15 +287,10 @@ function onClearClick() {
 	if(is_busy){ return; }
 	is_busy = true;
 
-	path_markers.clearLayers();
 	poly_data = [];
 	poly_shape.setLatLngs([]);
 	poly_markers.clearLayers();
-	path_data = [];
-	path_shape.setLatLngs([]);
-	extra_path_shape.setLatLngs([]);
-	//update_path();
-	is_busy = false;
+	update_path();
 	console.log("finishing onClearClick function");
 }
 var adjusting_altitude = false;
@@ -437,6 +432,7 @@ $(document).keyup(function(e) {
     }
 });
 
+
 // Initializing the Bird class
 class Bird {
     constructor(name, size) {
@@ -445,22 +441,20 @@ class Bird {
     }
 }
 
+var birds = {};
 function get_birds(){
-    console.log("test");
-    var birds = [];
+    var is_done = false;
     $.getJSON('/getBirds',{}, function(data) {
-        for(i=0;i<data.length();i++){
-            console.log(data[i]);
+        data = data.split(",");
+        for(var i=0;i<data.length;i=i+2){
+            name = data[i];
+            size = parseInt(data[i+1]);
+            bird = new Bird(name, size);
+            birds[name] = bird;
         }
     });
 }
-
-
-var birds = get_birds();
-
-
-var birds = ["Banded dotterel", "Black stilt", "Black-billed gull", "Black-fronted tern", "Caspian tern", "Pied stilt", "Red-billed gull", "South Island pied oystercatcher", "Variable oystercatcher", "White-fronted tern", "Wrybill"];
-var bird_size = {"Banded dotterel":20, "Black stilt":40, "Black-billed gull":35, "Black-fronted tern":28, "Caspian tern":50, "Pied stilt":35, "Red-billed gull":37, "South Island pied oystercatcher": 46, "Variable oystercatcher":48, "White-fronted tern":42, "Wrybill":20}
+get_birds();
 
 function simplify_string(str){
 	words = str.toLowerCase().trim().split(/\s+/);
@@ -475,8 +469,7 @@ function check_bird_complete(){
 	var result = ""
 
 	var matches = [];
-	for(var i=0; i<birds.length; i++){
-		bird_name = birds[i];
+	for(var bird_name in birds){
 		if(simplify_string(bird_name) == bird_input){
 			matches.push(bird_name);
 		}
@@ -486,8 +479,7 @@ function check_bird_complete(){
 	}
 	else{
 		matches = [];
-		for(var i=0; i<birds.length; i++){
-			bird_name = birds[i];
+	    for(var bird_name in birds){
 			if(simplify_string(bird_name).startsWith(bird_input)){
 				matches.push(bird_name);
 			}
@@ -497,8 +489,7 @@ function check_bird_complete(){
 		}
 		else{
 			matches = [];
-			for(var i=0; i<birds.length; i++){
-				bird_name = birds[i];
+	        for(var bird_name in birds){
 				if(simplify_string(bird_name).includes(bird_input)){
 					matches.push(bird_name);
 				}
@@ -622,7 +613,7 @@ function check_birds(){
 	G = 2 * h * Math.tan(a / 2  * Math.PI/180) / Math.sqrt(Math.pow(res_w, 2) + Math.pow(res_h, 2)) * 100
 
 	for(var i=0; i<birds_used.length; i++){
-		size = bird_size[birds_used[i]];
+		size = birds[birds_used[i]].size;
 		if(G < 0.5 * size){
 			bird_list.childNodes[i].style.backgroundColor = "rgba(0, 255, 0, 0.15)";
 		}
