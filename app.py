@@ -132,5 +132,48 @@ def get_path():
 #def page_not_found(e):
 #  return render_template('404.html', title="404"), 404
 
+
+
+
+
+# This is the function that controls the main page of the web site
+@app.route("/testing")
+def testingindex():
+	return render_template('testinghome.html')
+
+# This is the function that controls the main page of the web site
+@app.route("/testingaccount")
+def testingaccount():
+	return render_template('testingaccount.html', title="Your Account", username_str="flix328")
+
+# This is the function that controls the main page of the web site
+@app.route("/testingfiles")
+def testingfiles():
+	return render_template('testingfiles.html')
+
+# This is the function shows the plan page
+@app.route('/testingplan', methods=["GET","POST"])
+def testingplan():
+	return render_template('testingplan.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)

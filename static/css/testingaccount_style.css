@@ -1,0 +1,57 @@
+#account_info {
+    width: 30%;
+    margin: 25px 0 0 20%;
+}
+
+h2 {
+    margin: 0;
+}
+
+.box_label {
+	font-family: 'Arial', sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+
+    display: block;
+    margin: 8px 0 0 0;
+}
+
+.text_input {
+    width: 100%;
+}
+
+#update_password_button {
+    margin: 12px 0 0 0;
+
+	font-family: 'Arial', sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+
+    background-color: #d9ffdc;
+    border: 1px solid #00ba0d;
+
+    border-radius: 4px;
+}
+
+#update_password_msg {
+	font-family: 'Arial', sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	font-style: italic;
+
+	color: #dd2222;
+    margin: 5px 0;
+}
+
+#logout_button {
+    margin-top: 35px;
+
+	font-family: 'Arial', sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+
+    background-color: #ffd9da;
+    border: 1px solid #ff0004;
+
+    border-radius: 4px;
+}

@@ -1,0 +1,23 @@
+{% extends "testingindex.html" %}
+{% block content %}
+<link rel="stylesheet" href="../static/css/testingaccount_style.css"/>
+<div id="account_info">
+    <h2>{{ username_str }}</h2>
+    <form id="change_password" action="">
+        <h3>Change Password</h3>
+        <span class="box_label">current password</span>
+        <input class="text_input" type="text" name="current_password">
+
+        <span class="box_label">new password</span>
+        <input class="text_input" type="text" name="new_password">
+
+        <span class="box_label">confirm new password</span>
+        <input class="text_input" type="text" name="confirm_new_password">
+
+        <input id="update_password_button" type="submit" value="Update Password">
+        <br><p id="update_password_msg">Your password has been updated</p>
+    </form>
+
+    <button id="logout_button">Log Out</button>
+</div>
+{% endblock %}
