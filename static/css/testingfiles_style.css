@@ -50,6 +50,7 @@
     float: left;
     position: relative;
     padding: 1px;
+    cursor: pointer;
 }
 
 .file_list li:hover .options{

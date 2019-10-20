@@ -93,3 +93,12 @@
 		</div>
 		<script src="static/js/home_script.js"></script>
 {% endblock %}
+
+
+{% block sidebar_list %}
+                <li onclick="location.href='/testingaccount'">{{ username_str }}</li>
+                {% if current_user.is_authenticated %}
+		        <li onclick="location.href='/testingfiles'">Files</li>
+		        <li onclick="location.href='/testingplan'">New</li>
+		        {% endif %}
+{% endblock %}

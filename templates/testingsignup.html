@@ -2,19 +2,23 @@
 {% block content %}
 <link rel="stylesheet" href="../static/css/testingaccount_style.css"/>
 <div id="account_info">
-    <form id="change_password" action="">
+    <form id="sign_up" action="." method="POST">
         <h3>Create an Account</h3>
         <span class="box_label">username</span>
-        <input class="text_input" type="text" name="current_password">
+        <input class="text_input" type="text" name="username">
 
         <span class="box_label">password</span>
-        <input class="text_input" type="text" name="new_password">
+        <input class="text_input" type="password" name="password">
 
         <span class="box_label">confirm password</span>
-        <input class="text_input" type="text" name="confirm_new_password">
+        <input class="text_input" type="password" name="confirm_password">
 
-        <input id="update_password_button" type="submit" value="Sign Up">
-        <br><p id="update_password_msg">The passwords do not match</p>
+        <input class="form_button" type="submit" value="Sign Up">
+        <br><p class="form_msg">{{ signup_error }}</p>
     </form>
 </div>
+{% endblock %}
+
+{% block sidebar_list %}
+                <li onclick="location.href='/testingaccount'">Log In</li>
 {% endblock %}

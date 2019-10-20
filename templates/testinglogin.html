@@ -10,8 +10,13 @@
         <span class="box_label">password</span>
         <input class="text_input" type="password" name="password">
 
-        <input id="update_password_button" type="submit" value="Log In">
-        <br><p id="update_password_msg">{{ login_error }}</p>
+        <input class="form_button" type="submit" value="Log In">
+        <br><p class="form_msg">{{ login_error }}</p>
     </form>
+    <p class="box_label">Don't have an account? <a href="/testingsignup">Sign Up</a></p>
 </div>
+{% endblock %}
+
+{% block sidebar_list %}
+                <li onclick="location.href='/testingaccount'">Log In</li>
 {% endblock %}

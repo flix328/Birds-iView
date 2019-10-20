@@ -5,7 +5,8 @@
 
 from flask import Flask, render_template, jsonify, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import login_user, LoginManager, UserMixin
+
+from flask_login import login_user, LoginManager, UserMixin, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 # Creates a Flask object called 'app' that we can use throughout the programme
@@ -40,15 +41,33 @@ class User(UserMixin):
     def get_id(self):
         return self.username
 
-all_users = {
-    "admin": User("admin", generate_password_hash("secret")),
-    "bob": User("bob", generate_password_hash("less-secret")),
-    "caroline": User("caroline", generate_password_hash("completely-secret")),
-}
+class UserDB(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(255), unique=True)
+    password_hash = db.Column(db.String(255))
+    flight_paths = db.relationship("FlightPath")
+
+class FlightPath(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('userDB.id'))
+    altitude = db.Column(db.Float)
+    heading = db.Column(db.Float)
+    overlap = db.Column(db.Float)
+    resolution = db.Column(db.String(255))
+    view_angle = db.Column(db.Float)
+    bird_list = db.Column(db.String(255))
+    location = db.Column(db.String(255))
+    zoom_level = db.Column(db.Float)
+    point_list = db.Column(db.String(255))
 
 @login_manager.user_loader
 def load_user(user_id):
-    return all_users.get(user_id)
+    #return all_users.get(user_id)
+    query_data = UserDB.query.filter_by(username=user_id)
+    if query_data.count() != 1:
+        raise ValueError("database query returned {} results, should be 1".format(query_data.count()))
+    return User(user_id, query_data.first().password_hash)
+
 
 class Bird(db.Model):
     __tablename__ = "birds"
@@ -69,17 +88,17 @@ def get_birds():
 # This is the function that controls the main page of the web site
 @app.route("/")
 def index():
-	return render_template('home.html', title="My Application")
+	return render_template('home.html')
 
 # This is the function shows the plan page
 @app.route('/plan', methods=["GET","POST"])
 def plan():
-	return render_template('plan.html', title="Planning")
+	return render_template('plan.html')
 
 # This is the function shows the analyse page
 @app.route('/analyse', methods=["GET","POST"])
 def analyse():
-	return render_template('analyse.html', title="Analysis")
+	return render_template('analyse.html')
 
 
 # Add the "python_files" directory to sys.path to import other modules
@@ -169,56 +188,122 @@ def get_path():
 # This is the function that controls the main page of the web site
 @app.route("/testing")
 def testingindex():
-	return render_template('testinghome.html', username_str="Log In")
+    if current_user.is_authenticated:
+        username_str = current_user.username
+    else:
+        username_str = "Log In"
+    return render_template('testinghome.html', username_str=username_str)
 
-# This is the function that controls the main page of the web site
-@app.route("/testingaccount")
+# This is the function that holds account information
+@app.route("/testingaccount/", methods=["GET","POST"])
+@login_required
 def testingaccount():
-	return render_template('testingaccount.html', title="Your Account", username_str="flix328")
+    username = current_user.username
+    if request.method == "GET":
+        return render_template('testingaccount.html', username_str=username)
 
-# This is the function that controls the main page of the web site
+    current_password = request.form["current_password"]
+    if not current_user.check_password(current_password):
+        return render_template('testingaccount.html', username_str=username, password_update_str="Incorrect Password")
+    new_password = request.form["new_password"]
+    confirm_new_password = request.form["confirm_new_password"]
+    if new_password != confirm_new_password:
+        return render_template('testingaccount.html', username_str=username, password_update_str="The passwords do not match")
+
+    user = UserDB.query.filter_by(username=username)[0]
+    password_hash = generate_password_hash(new_password)
+    user.password_hash = password_hash
+    db.session.commit()
+    return render_template('testingaccount.html', username_str=username, password_update_str="Your password has been updated")
+
+# This is the function that holds a user's files
 @app.route("/testingfiles")
+@login_required
 def testingfiles():
-	return render_template('testingfiles.html', title="Your Files", username_str="flix328")
+	return render_template('testingfiles.html', username_str=current_user.username)
 
 # This is the function shows the plan page
 @app.route('/testingplan', methods=["GET","POST"])
+@login_required
 def testingplan():
-	return render_template('testingplan.html', title="Upper Waimak", username_str="flix328")
+	return render_template('testingplan.html', plan_name="Upper Waimak", username_str=current_user.username)
 
 @app.route("/testinglogin/", methods=["GET", "POST"])
 def testinglogin():
+    if current_user.is_authenticated:
+        return redirect("/testingaccount")
     if request.method == "GET":
         return render_template("testinglogin.html")
 
 
     username = request.form["username"]
-    if username not in all_users:
-        return render_template("login_page.html", error=True)
-    user = all_users[username]
+    query_data = UserDB.query.filter_by(username=username)
+    if query_data.count() == 0:
+        return render_template("testinglogin.html", login_error="That username is not registered")
+    user = User(username, query_data[0].password_hash)
 
     if not user.check_password(request.form["password"]):
         return render_template("testinglogin.html", login_error="The username or password is incorrect")
 
     login_user(user)
-    return redirect("/testingaccount")
+    return redirect("/testingfiles")
 
 
-# This is the function shows the plan page
-@app.route('/testingsignup', methods=["GET","POST"])
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    return redirect('/testinglogin')
+
+@app.route('/testingsignup/', methods=["GET","POST"])
 def testingsignup():
-	return render_template('testingsignup.html', username_str="Log In")
+    if current_user.is_authenticated:
+        return redirect("/testingaccount")
+    if request.method == "GET":
+        return render_template('testingsignup.html', username_str="Log In")
+
+    username = request.form["username"]
+    query_data = UserDB.query.filter_by(username=username)
+    if query_data.count() == 1:
+        return render_template("testingsignup.html", signup_error="That username is already registered")
+    password = request.form["password"]
+    confirm_password = request.form["confirm_password"]
+    if password != confirm_password:
+        return render_template("testingsignup.html", signup_error="The passwords do not match")
+    password_hash = generate_password_hash(password)
+    userDB = UserDB(username=username, password_hash=password_hash)
+    db.session.add(userDB)
+    db.session.commit()
+
+    user = User(username, password_hash)
+
+    login_user(user)
+    return redirect("/testingfiles")
+
+@app.route("/testinglogout")
+def logout():
+    logout_user()
+    return redirect("/testing")
 
 
+@app.route('/savePlan')
+def save_plan():
 
+    altitude = request.args['altitude']
+    heading = request.args['heading']
+    overlap = request.args['overlap']
+    resolution = request.args['resolution']
+    view_angle = request.args['view_angle']
+    bird_list = request.args['bird_list']
+    location = request.args['location']
+    zoom_level = request.args['zoom_level']
+    point_list = request.args['point_list']
 
+    flight_plan = FlightPath(user_id=current_user.username, altitude=altitude, heading=heading, overlap=overlap,
+    resolution=resolution, view_angle=view_angle, bird_list=bird_list, location=location,
+    zoom_level=zoom_level, point_list=point_list)
+    db.session.add(flight_plan)
+    db.session.commit()
 
-
-
-
-
-
-
+    return jsonify("")
 
 
 

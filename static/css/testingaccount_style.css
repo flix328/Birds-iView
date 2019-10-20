@@ -20,7 +20,7 @@ h2 {
     width: 100%;
 }
 
-#update_password_button {
+.form_button {
     margin: 12px 0 0 0;
 
 	font-family: 'Arial', sans-serif;
@@ -33,7 +33,7 @@ h2 {
     border-radius: 4px;
 }
 
-#update_password_msg {
+.form_msg {
 	font-family: 'Arial', sans-serif;
 	font-size: 12px;
 	font-weight: normal;

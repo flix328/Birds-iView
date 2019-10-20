@@ -52,3 +52,16 @@
             <script src="static/js/testingplan_script.js"></script>
 
 {% endblock %}
+
+{% block sidebar_list %}
+                <li onclick="location.href='/testingaccount'">{{ username_str }}</li>
+		        <li onclick="location.href='/testingfiles'">Files</li>
+		        <li onclick="location.href='/testingplan'">New</li>
+		        <li onclick="javascript:savePlan()">Save</li>
+		        <li onclick='onExportClick()'>Export</li>
+		        <li onclick="">Help</li>
+{% endblock %}
+
+{ % block title_heading % }
+            <h1 contenteditable="true">{{ plan_name }}</h1>
+{% endblock %}

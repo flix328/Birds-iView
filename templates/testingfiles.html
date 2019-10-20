@@ -29,7 +29,16 @@
         <li>Styx Mill</li>
     </ul>
 
-
-
 </div>
 {% endblock %}
+
+
+{% block sidebar_list %}
+                <li onclick="location.href='/testingaccount'">{{ username_str }}</li>
+		        <li onclick="location.href='/testingfiles'">Files</li>
+		        <li onclick="location.href='/testingplan'">New</li>
+{% endblock %}
+{#
+{ % block title_heading % }
+            <h1>Your Files</h1>
+{% endblock %}#}

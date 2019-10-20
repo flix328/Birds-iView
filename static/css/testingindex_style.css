@@ -135,6 +135,7 @@ header {
 	font-family: 'Arial', sans-serif;
 	font-size: 16px;
 	font-weight: normal;
+    cursor: pointer;
 }
 
 #sidebar_options li:hover {

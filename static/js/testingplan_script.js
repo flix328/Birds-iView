@@ -670,3 +670,29 @@ function onExportClick(){
     hiddenElement.download = 'birds_iview_flight_path.csv';
     hiddenElement.click();
 }
+
+
+function savePlan(){
+    var point_list = "";
+    for(var i=0; i < poly_data.length; i++){
+        point_list = point_list + poly_data[i][1] + "," + poly_data[i][2] + ",";
+    }
+    point_list = point_list.slice(0, -1);
+
+
+    result_data = {
+        altitude: parseFloat(document.getElementById("altitude_value").value.slice(0, -1)),
+        heading: parseFloat(document.getElementById("heading_value").value.slice(0, -1)),
+        overlap: parseFloat(document.getElementById("overlap_value").value.slice(0, -1)) * 0.01,
+        resolution: document.getElementById("resolution_input").value,
+        view_angle: parseFloat(document.getElementById("view_angle_input").value),
+        bird_list: birds_used.toString(),
+        location: map.getCenter().lat.toString() + ", " + map.getCenter().lng.toString(),
+        zoom_level: map.getZoom(),
+        point_list: point_list
+    }
+    $.getJSON('/savePlan',result_data, function(data) {
+
+		console.log("did the save thing");
+	});
+}

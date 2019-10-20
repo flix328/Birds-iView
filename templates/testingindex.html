@@ -12,7 +12,7 @@
 		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 		<link href="https://fonts.googleapis.com/css?family=Josefin+Sans&display=swap" rel="stylesheet">
-		<link rel="icon" href="static/images/favicon.png" type="image/png" sizes="349x349">
+		<link rel="icon" href="../static/images/favicon.png" type="image/png" sizes="349x349">
 
 
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
@@ -23,20 +23,18 @@
 	</head>
 	<body>
 		<header>
-			<div id="title_div"><h1>{{ title }}</h1></div>
+			<div id="title_div">{% block title_heading %}{% endblock %}</div>
 		    <img class="menu_icon" onclick="show_sidebar()" src="../static/images/ic_menu.png" alt="menu icon"/>
-			<a class="logo_small" href="javascript:alert('logo_click')"><span style="color:#ff3b3f">Birds</span> <span style="color:#833103">iView</span></a>
-			<a id="username_title" href="/account">{{ username_str }}</a>
+			<a class="logo_small" href="/testing"><span style="color:#ff3b3f">Birds</span> <span style="color:#833103">iView</span></a>
+			<a id="username_title" href="/testingaccount">{{ username_str }}</a>
 		</header>
 		<div id="sidebar">
 		    <div id="sidebar_title">
                 <img class="menu_icon" id="sidebar_menu_icon" onclick="hide_sidebar()" src="../static/images/ic_menu.png" alt="menu icon"/>
-			    <a class="logo_small" id="sidebar_logo_small" href="javascript:alert('logo_click')"><span style="color:#ff3b3f">Birds</span> <span style="color:#833103">iView</span></a>
+			    <a class="logo_small" id="sidebar_logo_small" href="/testing"><span style="color:#ff3b3f">Birds</span> <span style="color:#833103">iView</span></a>
 		    </div>
 		    <ul id="sidebar_options">
-		        <li>{{ username_str }}</li>
-		        <li>Files</li>
-		        <li>New</li>
+		        {% block sidebar_list %}{% endblock %}
 		    </ul>
 
 		</div>
@@ -44,5 +42,5 @@
 			{% block content %}{% endblock %}
 		</main>
 	</body>
-	<script src="static/js/testingindex_script.js"></script>
+	<script src="../static/js/testingindex_script.js"></script>
 </html>

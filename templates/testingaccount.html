@@ -3,21 +3,31 @@
 <link rel="stylesheet" href="../static/css/testingaccount_style.css"/>
 <div id="account_info">
     <h2>{{ username_str }}</h2>
-    <form id="change_password" action="">
+    <form id="change_password" action="." method="POST">
         <h3>Change Password</h3>
         <span class="box_label">current password</span>
-        <input class="text_input" type="text" name="current_password">
+        <input class="text_input" type="password" name="current_password">
 
         <span class="box_label">new password</span>
-        <input class="text_input" type="text" name="new_password">
+        <input class="text_input" type="password" name="new_password">
 
         <span class="box_label">confirm new password</span>
-        <input class="text_input" type="text" name="confirm_new_password">
+        <input class="text_input" type="password" name="confirm_new_password">
 
-        <input id="update_password_button" type="submit" value="Update Password">
-        <br><p id="update_password_msg">Your password has been updated</p>
+        <input class="form_button" type="submit" value="Update Password">
+        <br><p class="form_msg">{{ password_update_str }}</p>
     </form>
 
-    <button id="logout_button">Log Out</button>
+    <button id="logout_button" onclick="location.href='/testinglogout'">Log Out</button>
 </div>
 {% endblock %}
+
+{% block sidebar_list %}
+                <li onclick="location.href='/testingaccount'">{{ username_str }}</li>
+		        <li onclick="location.href='/testingfiles'">Files</li>
+		        <li onclick="location.href='/testingplan'">New</li>
+{% endblock %}
+{#
+{ % block title_heading % }
+            <h1>Your Account</h1>
+{% endblock %}#}
