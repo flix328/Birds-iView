@@ -2,16 +2,16 @@
 {% block content %}
 <link rel="stylesheet" href="../static/css/testingaccount_style.css"/>
 <div id="account_info">
-    <form id="change_password" action="">
+    <form id="change_password" action="." method="POST">
         <h3>Login</h3>
         <span class="box_label">username</span>
-        <input class="text_input" type="text" name="current_password">
+        <input class="text_input" type="text" name="username">
 
         <span class="box_label">password</span>
-        <input class="text_input" type="text" name="new_password">
+        <input class="text_input" type="password" name="password">
 
         <input id="update_password_button" type="submit" value="Log In">
-        <br><p id="update_password_msg">The username or password is incorrect</p>
+        <br><p id="update_password_msg">{{ login_error }}</p>
     </form>
 </div>
 {% endblock %}

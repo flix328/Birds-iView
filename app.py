@@ -3,8 +3,10 @@
 # https://github.com/stevedunford/NZVintageRadios
 # https://blog.pythonanywhere.com/121/
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import login_user, LoginManager, UserMixin
+from werkzeug.security import check_password_hash, generate_password_hash
 
 # Creates a Flask object called 'app' that we can use throughout the programme
 app = Flask(__name__)
@@ -19,6 +21,34 @@ app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
+app.secret_key = "9hgnt493n);@%2n8t3)2"
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+class User(UserMixin):
+
+    def __init__(self, username, password_hash):
+        self.username = username
+        self.password_hash = password_hash
+
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+
+    def get_id(self):
+        return self.username
+
+all_users = {
+    "admin": User("admin", generate_password_hash("secret")),
+    "bob": User("bob", generate_password_hash("less-secret")),
+    "caroline": User("caroline", generate_password_hash("completely-secret")),
+}
+
+@login_manager.user_loader
+def load_user(user_id):
+    return all_users.get(user_id)
 
 class Bird(db.Model):
     __tablename__ = "birds"
@@ -156,10 +186,23 @@ def testingfiles():
 def testingplan():
 	return render_template('testingplan.html', title="Upper Waimak", username_str="flix328")
 
-# This is the function shows the plan page
-@app.route('/testinglogin', methods=["GET","POST"])
+@app.route("/testinglogin/", methods=["GET", "POST"])
 def testinglogin():
-	return render_template('testinglogin.html', username_str="Log In")
+    if request.method == "GET":
+        return render_template("testinglogin.html")
+
+
+    username = request.form["username"]
+    if username not in all_users:
+        return render_template("login_page.html", error=True)
+    user = all_users[username]
+
+    if not user.check_password(request.form["password"]):
+        return render_template("testinglogin.html", login_error="The username or password is incorrect")
+
+    login_user(user)
+    return redirect("/testingaccount")
+
 
 # This is the function shows the plan page
 @app.route('/testingsignup', methods=["GET","POST"])
