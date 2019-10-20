@@ -1,0 +1,114 @@
+#mapid {
+	width: 100%;
+    height: calc(100vh - 40.1px);
+	z-index: 500;
+}
+
+#map_type {
+	display: block;
+	position: absolute;
+	background-color: rgba(0,0,0,0.2);
+	top: 10px;
+	left: 54px;
+	z-index: 401;
+	margin: 0;
+	padding: 2px;
+	border-radius: 4px;
+}
+
+#map_type a {
+	display: block;
+	width: 61px;
+	height: 61px;
+	border-radius: 2px;
+	text-decoration: none;
+	line-height: 61px;
+	text-align: center;
+	font-family: 'Josefin Sans', sans-serif;
+	font-size: 13px;
+	font-weight: bolder;
+	color: #343434;
+	text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+	background-size: cover;
+	background-image: url("/static/images/mapbox_streets.png");
+
+	user-select: none; /* supported by Chrome and Opera */
+   -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+   -moz-user-select: none; /* Firefox */
+   -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+#control_bar {
+    position: absolute;
+    display: block;
+    right:0;
+    height: 100%;
+    z-index: 1001;
+
+    background-color: #f8f8f8;
+    width: 300px;
+    float: right;
+
+    border-left: solid #6a6a6a .1px;
+}
+
+#control_bar.enter{
+    transform: translateX(0);
+    transition: 0.3s;
+  -webkit-transition: 0.3s;
+  -moz-transition: 0.3s;
+  -ms-transition: 0.3s;
+  -o-transition: 0.3s;
+}
+
+#control_bar.exit{
+    transform: translateX(100%);
+    transition: 0.3s;
+  -webkit-transition: 0.3s;
+  -moz-transition: 0.3s;
+  -ms-transition: 0.3s;
+  -o-transition: 0.3s;
+}
+
+#control_toggle_btn {
+    display: block;
+    background-color: #f8f8f8;
+    border-bottom-left-radius: 5px;
+    border-left: solid #6a6a6a .5px;
+    border-bottom: solid #6a6a6a .5px;
+    height: 20px;
+    width: 20px;
+    padding: 5px;
+    position: absolute;
+    left:-30px;
+}
+
+#control_bar_header {
+    height: 30px;
+    border-bottom: solid #6a6a6a .5px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+#control_bar_header img {
+    height: 28px;
+}
+
+#control_bar_options {
+
+}
+
+.control_box {
+    width: 100%;
+    border-bottom: solid #6a6a6a .1px;
+}
+
+#altitude_box {
+    height: 200px;
+}
+#heading_box {
+    height: 200px;
+}

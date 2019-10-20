@@ -149,12 +149,12 @@ def testingaccount():
 # This is the function that controls the main page of the web site
 @app.route("/testingfiles")
 def testingfiles():
-	return render_template('testingfiles.html')
+	return render_template('testingfiles.html', title="Your Files", username_str="flix328")
 
 # This is the function shows the plan page
 @app.route('/testingplan', methods=["GET","POST"])
 def testingplan():
-	return render_template('testingplan.html')
+	return render_template('testingplan.html', title="Upper Waimak", username_str="flix328")
 
 
 

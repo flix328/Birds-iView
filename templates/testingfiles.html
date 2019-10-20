@@ -1,5 +1,35 @@
 {% extends "testingindex.html" %}
 {% block content %}
 <link rel="stylesheet" href="../static/css/testingfiles_style.css"/>
-<p>juirghoiawbogi ogfihaewoi </p>
+<div id="flight_plans_info">
+    <div id="flight_plans_title">
+        <h2>Flight Plans</h2>
+        <img class="add_icon" src="../static/images/ic_add.png" onclick="javascript:alert('add flight path')"/>
+    </div>
+    <ul class="file_list">
+        <li><a>Lake Ellesmere - NE Quarter</a><div class="options">
+            <img src="../static/images/ic_export2.png" onclick="alert('export thing')">
+            <img src="../static/images/ic_edit.png" onclick="alert('edit thing')">
+            <img src="../static/images/ic_delete2.png" onclick="alert('delete thing')"></div></li>
+        <li>Upper Waimak</li>
+        <li>Styx Mill</li>
+        <li>Lower Waimak Lagoon</li>
+    </ul>
+
+
+
+</div>
+<div id="analyses_info">
+    <div id="analyses_title">
+        <h2>Analyses</h2>
+        <img class="add_icon" src="../static/images/ic_add.png" onclick="javascript:alert('add flight path')"/>
+    </div>
+    <ul class="file_list">
+        <li>Lake Ellesmere - NE Quarter</li>
+        <li>Styx Mill</li>
+    </ul>
+
+
+
+</div>
 {% endblock %}

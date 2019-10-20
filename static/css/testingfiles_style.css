@@ -1,0 +1,61 @@
+#flight_plans_info {
+    position: absolute;
+    width: 30%;
+    margin: 25px 0 0 17%;
+}
+
+#analyses_info {
+    position: absolute;
+    width: 30%;
+    margin: 25px 0 0 53%;
+}
+
+.add_icon {
+    display: block;
+    height: 14px;
+    width: auto;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    cursor: pointer;
+}
+
+.file_list {
+    list-style: none;
+    padding: 0;
+
+	font-family: 'Arial', sans-serif;
+	font-size: 16px;
+	font-weight: normal;
+
+}
+
+.file_list li {
+    line-height: 25px;
+    position: relative;
+}
+
+.file_list li .options{
+    display: none;
+    height: 20px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.file_list li .options img{
+    display: block;
+    height: 100%;
+    width: auto;
+    float: left;
+    position: relative;
+    padding: 1px;
+}
+
+.file_list li:hover .options{
+    display: block;
+}
+
+h2 {
+    margin: 0;
+}

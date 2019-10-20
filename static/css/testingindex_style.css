@@ -144,7 +144,7 @@ header {
 main {
 	width: 100%;
 	position: absolute;
-	margin-top: 40.1px;
+	top: 40.1px;
 }
 
 h2 {
