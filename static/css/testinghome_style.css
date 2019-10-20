@@ -1,0 +1,83 @@
+#top_text {
+	display: block;
+	width: 100%;
+	height: auto;
+	background-color: white;
+	padding: 10px 30px 5px 30px;
+	text-align: center;
+	margin: 0;
+	color: #515151;
+	font-family: 'Josefin Sans', sans-serif;
+	font-size: 16px;
+}
+
+#sky_box {
+	width: 100%;
+	height: 350px;
+	position: relative;
+	background-image: url("/static/images/cloud_top.png"), url("/static/images/ground_birds.png"), linear-gradient(#89c4f6, #aedbfd);
+	background-repeat: repeat-x, repeat-x, repeat;
+	background-position: top center, bottom center, top left;
+	background-size: auto 25px, auto 50px, cover;
+
+	border-bottom: 5px solid #4cc556;
+
+	display: block;
+}
+
+#drone_photo_img {
+	height: 300px;
+	position: absolute;
+	bottom: 0;
+
+	left:50%;
+	margin-left: 0;
+}
+
+h2 {
+	color: #515151;
+	font-family: 'Josefin Sans', sans-serif;
+	font-size: 28px;
+	margin: 16px auto;
+	text-align: center;
+}
+
+#help_box {
+	background-color: #f3f3f3;
+	border-radius: 10px;
+	padding: 15px;
+	margin: 15px auto;
+	display: block;
+	width: 80%;
+}
+
+#grid_box {
+	width: 100%;
+	height: auto;
+
+	display: grid;
+}
+
+#grid_box > p {
+	width: 50%;
+	display: block;
+	color: #515151;
+	font-family: 'Josefin Sans', sans-serif;
+	font-size: 16px;
+	padding: 10px;
+	line-height:19px;
+	justify-self: end;
+	align-self: center;
+}
+
+#grid_box > img {
+	grid-column-start: 2;
+	grid-column-end: 2;
+
+	border: 4px solid white;
+	display: block;
+	border-radius: 0;
+	width: 65%;
+	/*max-height: 250px;*/
+	margin: 3px;
+}

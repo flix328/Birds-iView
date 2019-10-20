@@ -139,7 +139,7 @@ def get_path():
 # This is the function that controls the main page of the web site
 @app.route("/testing")
 def testingindex():
-	return render_template('testinghome.html')
+	return render_template('testinghome.html', username_str="Log In")
 
 # This is the function that controls the main page of the web site
 @app.route("/testingaccount")
@@ -156,9 +156,15 @@ def testingfiles():
 def testingplan():
 	return render_template('testingplan.html', title="Upper Waimak", username_str="flix328")
 
+# This is the function shows the plan page
+@app.route('/testinglogin', methods=["GET","POST"])
+def testinglogin():
+	return render_template('testinglogin.html', username_str="Log In")
 
-
-
+# This is the function shows the plan page
+@app.route('/testingsignup', methods=["GET","POST"])
+def testingsignup():
+	return render_template('testingsignup.html', username_str="Log In")
 
 
 

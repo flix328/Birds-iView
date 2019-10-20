@@ -28,7 +28,7 @@ function onMapTypeClick(){
 
 
 		$("#map_type a").text('Satellite');
-		document.querySelector("#map_type a").style.backgroundImage = "url('/static/images/mapbox_satellite.png')";
+		document.getElementById("map_type_a").style.backgroundImage = "url('/static/images/mapbox_satellite.png')";
 	}
 	else{
 		map.removeLayer(map_layer);
@@ -40,29 +40,10 @@ function onMapTypeClick(){
 			id: 'mapbox.satellite'
 		}).addTo(map);
 		$("#map_type a").text('Streets');
-		document.querySelector("#map_type a").style.backgroundImage = "url('/static/images/mapbox_streets.png')";
+		document.getElementById("map_type_a").style.backgroundImage = "url('/static/images/mapbox_streets.png')";
 	}
 	is_satellite = !is_satellite;
 }
-
-control_bar = document.getElementById('control_bar');
-control_toggle_btn = document.getElementById('control_toggle_btn');
-var controls_visible = true;
-function toggle_control_bar(){
-    if(controls_visible){
-        control_bar.classList.remove('enter');
-        control_bar.classList.add('exit');
-        control_toggle_btn.src="../static/images/ic_reveal.png";
-        controls_visible = false;
-    }
-    else {
-        control_bar.classList.remove('exit');
-        control_bar.classList.add('enter');
-        control_toggle_btn.src="../static/images/ic_hide.png";
-        controls_visible = true;
-    }
-}
-
 
 var polyIcon = L.icon({
 
@@ -233,7 +214,7 @@ function update_path(){
 }
 
 
-var controlID = document.getElementById("control_bar");
+var controlID = document.getElementById("controls");
 L.DomEvent.disableClickPropagation(controlID);
 L.DomEvent.disableScrollPropagation(controlID);
 var map_typeID = document.getElementById("map_type");

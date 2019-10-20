@@ -1,30 +1,54 @@
 {% extends "testingindex.html" %}
 {% block content %}
             <link rel="stylesheet" href="../static/css/testingplan_style.css"/>
+            <link rel="stylesheet" href="../static/css/slidestyle.css"/>
 
             <div id="mapid">
-            	<div id="map_type"><a onclick='onMapTypeClick()'>Streets</a></div>
-            	<div id="control_bar">
-                    <img id="control_toggle_btn" src="../static/images/ic_hide.png" onclick="toggle_control_bar()"/>
-                	<div id="control_bar_header">
-                        <img src="../static/images/testingic_altitude.png" onclick=""/>
-                        <img src="../static/images/testingic_heading.png" onclick=""/>
-                        <img src="../static/images/testingic_overlap.png" onclick=""/>
-                        <img src="../static/images/testingic_camera.png" onclick=""/>
-                        <img src="../static/images/testingic_bird.png" onclick=""/>
-                    </div>
-                    <div id="control_bar_options">
-                        <div class="control_box" id="altitude_box">
-                            <img src="../static/images/testingic_altitude.png" onclick=""/>
-                            <h4>Altitude</h4>
-                        </div>
-                        <div class="control_box" id="heading_box">
+    			<div id="map_type"><a id="map_type_a" onclick='onMapTypeClick()'>Streets</a></div>
+    			<ul id="controls">
+    				<li id="delete_group"><ul>
+    					<li id="delete_btn" style='background-image: url("static/images/ic_delete.png")'><a onclick='onClearClick()'><span>Clear</span></a></li>
+    				</ul></li>
+    				<li id="adjust_group"><ul>
+    						<li id="altitude_btn" style='background-image: url("static/images/ic_altitude.png")'><a onclick='onAltitudeClick()'><span class="adjust_label">Altitude</span></a></li>
+    						<li id="heading_btn" style='background-image: url("static/images/ic_heading.png")'><a onclick='onHeadingClick()'><span class="adjust_label">Heading</span></a></li>
+    						<li id="overlap_btn" style='background-image: url("static/images/ic_overlap.png")'><a onclick='onOverlapClick()'><span class="adjust_label">Overlap</span></a></li>
+    						<li id="camera_btn" style='background-image: url("static/images/ic_camera.png")'><a onclick='onCameraClick()'><span class="adjust_label">Camera Settings</span></a></li>
+    						<li id="birds_btn" style='background-image: url("static/images/ic_bird.png")'><a onclick='onBirdClick()'><span class="adjust_label">Birds</span></a></li>
+    					</ul>
+    					<div id="altitude_box">
+    						<div id="altitude_slider"></div>
+    						<input type="text" id="altitude_value" readonly>
+    					</div>
+    					<div id="heading_box">
+    						<div id="heading_slider"></div>
+    						<input type="text" id="heading_value" readonly>
+    					</div>
+    					<div id="overlap_box">
+    						<div id="overlap_slider"></div>
+    						<input type="text" id="overlap_value" readonly>
+    					</div>
+    					<div id="camera_box">
+    						<h6>Resolution</h6>
+    						<input type="text" id="resolution_input" name="resolution_value" value="960x640" spellcheck="false">
+    						<h6>Diagonal AOV</h6>
+    						<input type="text" id="view_angle_input" name="view_angle_value" value="104.4" spellcheck="false">
+    					</div>
+    					<div id="bird_box">
+    						<input type="text" name="bird_input" id="bird_input" placeholder="eg. Wrybill">
+    						<input type="text" name="bird_complete" id="bird_complete" readonly onclick="add_bird()">
+    						<ul id="bird_list"></ul>
+    					</div>
 
-                        </div>
-                    </div>
+    				</li>
 
-            	</div>
-            </div>
+    			</ul>
+    			<div id="summary_box">
+    				<p id="stat_area">Survey Area: None</p>
+    				<p id="stat_dist">Flight Distance: None</p>
+    				<p id="stat_num_photos">Number of Photos: None</p>
+    			</div>
+    		</div>
             <script src="static/js/testingplan_script.js"></script>
 
 {% endblock %}
