@@ -50,6 +50,7 @@ class UserDB(db.Model):
 class FlightPath(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('userDB.id'))
+    name = db.Column(db.String(255))
     altitude = db.Column(db.Float)
     heading = db.Column(db.Float)
     overlap = db.Column(db.Float)
@@ -65,7 +66,7 @@ def load_user(user_id):
     #return all_users.get(user_id)
     query_data = UserDB.query.filter_by(username=user_id)
     if query_data.count() != 1:
-        raise ValueError("database query returned {} results, should be 1".format(query_data.count()))
+        print("database query returned {} results, should be 1".format(query_data.count()))
     return User(user_id, query_data.first().password_hash)
 
 
@@ -253,6 +254,40 @@ def testinglogin():
 def unauthorized_callback():
     return redirect('/testinglogin')
 
+import emoji
+def bad_username(s):
+    if len(s) < 1:
+        return "username must be at least 5 characters long"
+    if len(s) > 20:
+        return "username can be at most 20 characters long"
+    has_emoji = False
+    i = 0
+    while(i < len(s) and not has_emoji):
+        c = s[i]
+        if c in emoji.UNICODE_EMOJI:
+            has_emoji = True
+        i += 1
+    if has_emoji:
+        return "username cannot contain emoji"
+    return False
+
+def bad_password(s):
+    if len(s) < 5:
+        return "password must be at least 5 characters long"
+    if len(s) > 20:
+        return "password can be at most 20 characters long"
+    has_emoji = False
+    i = 0
+    while(i < len(s) and not has_emoji):
+        c = s[i]
+        if c in emoji.UNICODE_EMOJI:
+            has_emoji = True
+        i += 1
+    if has_emoji:
+        return "password cannot contain emoji"
+    return False
+
+
 @app.route('/testingsignup/', methods=["GET","POST"])
 def testingsignup():
     if current_user.is_authenticated:
@@ -264,10 +299,16 @@ def testingsignup():
     query_data = UserDB.query.filter_by(username=username)
     if query_data.count() == 1:
         return render_template("testingsignup.html", signup_error="That username is already registered")
+    username_bad = bad_username(username)
+    if username_bad:
+        return render_template("testingsignup.html", signup_error=username_bad)
     password = request.form["password"]
     confirm_password = request.form["confirm_password"]
     if password != confirm_password:
         return render_template("testingsignup.html", signup_error="The passwords do not match")
+    password_bad = bad_password(password)
+    if password_bad:
+        return render_template("testingsignup.html", signup_error=password_bad)
     password_hash = generate_password_hash(password)
     userDB = UserDB(username=username, password_hash=password_hash)
     db.session.add(userDB)
@@ -286,7 +327,7 @@ def logout():
 
 @app.route('/savePlan')
 def save_plan():
-
+    name=request.args['name']
     altitude = request.args['altitude']
     heading = request.args['heading']
     overlap = request.args['overlap']
@@ -297,9 +338,23 @@ def save_plan():
     zoom_level = request.args['zoom_level']
     point_list = request.args['point_list']
 
-    flight_plan = FlightPath(user_id=current_user.username, altitude=altitude, heading=heading, overlap=overlap,
-    resolution=resolution, view_angle=view_angle, bird_list=bird_list, location=location,
-    zoom_level=zoom_level, point_list=point_list)
+
+    query_data = UserDB.query.filter_by(username=current_user.user_id).filter_by(name=name)
+    assert query_data.count() < 2
+    if query_data.count() == 1:
+        flight_plan = query_data.first()
+    else:
+        flight_plan = FlightPath()
+
+    flight_plan.altitude = altitude
+    flight_plan.heading = heading
+    flight_plan.overlap = overlap
+    flight_plan.resolution = resolution
+    flight_plan.view_angle = view_angle
+    flight_plan.bird_list = bird_list
+    flight_plan.location = location
+    flight_plan.zoom_level = zoom_level
+    flight_plan.point_list = point_list
     db.session.add(flight_plan)
     db.session.commit()
 
