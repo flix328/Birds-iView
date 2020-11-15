@@ -4,32 +4,31 @@
 <div id="flight_plans_info">
     <div id="flight_plans_title">
         <h2>Flight Plans</h2>
-        <img class="add_icon" src="../static/images/ic_add.png" onclick="javascript:alert('add flight path')"/>
+        <img class="add_icon" src="../static/images/ic_add.png" onclick="location.href='/testingplan'"/>
     </div>
     <ul class="file_list">
-        <li><a>Lake Ellesmere - NE Quarter</a><div class="options">
-            <img src="../static/images/ic_export2.png" onclick="alert('export thing')">
-            <img src="../static/images/ic_edit.png" onclick="alert('edit thing')">
-            <img src="../static/images/ic_delete2.png" onclick="alert('delete thing')"></div></li>
-        <li>Upper Waimak</li>
-        <li>Styx Mill</li>
-        <li>Lower Waimak Lagoon</li>
-    </ul>
 
+        {% for filename in filenames %}
+            <li><a>{{ filename }}</a><div class="options">
+            <img src="../static/images/ic_export2.png" onclick="export_flight_path('{{ filename }}')">
+            <img src="../static/images/ic_edit.png" onclick="edit_flight_path('{{ filename }}')">
+            <img src="../static/images/ic_delete2.png" onclick="delete_flight_path('{{ filename }}')"></div></li>
+        {% endfor %}
+    </ul>
 
 
 </div>
 <div id="analyses_info">
     <div id="analyses_title">
         <h2>Analyses</h2>
-        <img class="add_icon" src="../static/images/ic_add.png" onclick="javascript:alert('add flight path')"/>
+        <img class="add_icon" src="../static/images/ic_add.png" onclick=""/>
     </div>
     <ul class="file_list">
-        <li>Lake Ellesmere - NE Quarter</li>
-        <li>Styx Mill</li>
+        <li>Analyses are not yet available</li>
     </ul>
 
 </div>
+<script src="../static/js/testingfiles_script.js"></script>
 {% endblock %}
 
 

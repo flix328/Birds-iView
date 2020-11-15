@@ -671,7 +671,8 @@ function onExportClick(){
     hiddenElement.click();
 }
 
-
+title_text = document.getElementById("title_text");
+title_text.contentEditable = "true";
 function savePlan(){
     var point_list = "";
     for(var i=0; i < poly_data.length; i++){
@@ -681,7 +682,7 @@ function savePlan(){
 
 
     result_data = {
-        name: Math.random().toString(),
+        name: title_text.innerHTML,
         altitude: parseFloat(document.getElementById("altitude_value").value.slice(0, -1)),
         heading: parseFloat(document.getElementById("heading_value").value.slice(0, -1)),
         overlap: parseFloat(document.getElementById("overlap_value").value.slice(0, -1)) * 0.01,

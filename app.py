@@ -180,7 +180,7 @@ def get_path():
 # This function deals with any missing pages and shows the Error page
 #@app.errorhandler(404)
 #def page_not_found(e):
-#  return render_template('404.html', title="404"), 404
+#  return render_template('404.html'), 404
 
 
 
@@ -221,13 +221,17 @@ def testingaccount():
 @app.route("/testingfiles")
 @login_required
 def testingfiles():
-	return render_template('testingfiles.html', username_str=current_user.username)
+    user_id = UserDB.query.filter_by(username=current_user.username).first().id
+    query_data = FlightPath.query.filter_by(user_id=user_id)
+    filenames = [row.name for row in query_data]
+
+    return render_template('testingfiles.html', title="Your Files", filenames=filenames, username_str=current_user.username)
 
 # This is the function shows the plan page
 @app.route('/testingplan', methods=["GET","POST"])
 @login_required
 def testingplan():
-	return render_template('testingplan.html', plan_name="Upper Waimak", username_str=current_user.username)
+	return render_template('testingplan.html', title="Untitled Plan", username_str=current_user.username)
 
 @app.route("/testinglogin/", methods=["GET", "POST"])
 def testinglogin():
@@ -338,13 +342,18 @@ def save_plan():
     zoom_level = request.args['zoom_level']
     point_list = request.args['point_list']
 
+    #print(name, altitude, heading, overlap, resolution, view_angle, bird_list, location, zoom_level, point_list)
+    user_id = UserDB.query.filter_by(username=current_user.username).first().id
+    query_data = FlightPath.query.filter_by(user_id=user_id).filter_by(name=name)
+    #print(UserDB.query.filter_by(username=current_user.user_id))
+    #print(UserDB.query.filter_by(username=current_user.user_id).filter_by(name=name))
 
-    query_data = UserDB.query.filter_by(username=current_user.user_id).filter_by(name=name)
     assert query_data.count() < 2
     if query_data.count() == 1:
         flight_plan = query_data.first()
     else:
-        flight_plan = FlightPath()
+        flight_plan = FlightPath(user_id=user_id, name=name)
+
 
     flight_plan.altitude = altitude
     flight_plan.heading = heading
@@ -360,7 +369,9 @@ def save_plan():
 
     return jsonify("")
 
-
+@app.route('/deletePlan')
+def delete_plan():
+    name = request.args['filename']
 
 
 
