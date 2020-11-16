@@ -40,6 +40,7 @@ class Polygon():
             poly.head.prev = new_node
             poly._id_node[_id] = new_node
         poly.length += 1
+    
     def _push_between_nodes(poly, _id, data, node0, node1):
         if(node0.next != node1):
             raise ValueError("cannot push between {} and {} as they are not adjacent".format(v0, v1))
@@ -127,6 +128,7 @@ class Polygon():
 
 
 def main():
+    ''' testing data for Polygons '''
     A = Polygon()
     for _id, lat, lng in [(62, 73, -41), (65, 34, -38), (78, 43, 48)]:
         A.push_end(_id, Point(lat, lng))

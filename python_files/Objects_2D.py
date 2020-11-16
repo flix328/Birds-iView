@@ -175,7 +175,7 @@ class LineSegment():
         '''returns the point of intersection of S0 and S1, if they intersect'''
         L0, L1 = Line(S0), Line(S1)
         p = L0.intersection(L1)
-        if p is not None and S0.contains(p):
+        if p is not None and S0.contains(p) and S1.contains(p):
             return p
         return None
     
